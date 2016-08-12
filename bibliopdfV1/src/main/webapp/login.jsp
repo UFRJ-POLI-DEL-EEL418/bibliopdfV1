@@ -76,7 +76,7 @@
             <br>
             <br>
             tente de novo 
-            <a href="/bibliopdf/protegido/busca_catalogacao.jsp" style="color:#f1e2af;">
+            <a href="<%= request.getContextPath() %>/protegido/busca_catalogacao.jsp" style="color:#f1e2af;">
                 aqui
             </a>.
             </div>
