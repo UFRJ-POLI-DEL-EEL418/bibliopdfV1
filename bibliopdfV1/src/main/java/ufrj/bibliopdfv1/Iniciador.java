@@ -18,7 +18,7 @@ public class Iniciador implements ServletContextListener {
         try{
             ServletContext ctx =  sce.getServletContext();
             url = ctx.getResource("/caminho_completo_arquivos.properties");
-System.out.println("===== "+url.toString());
+System.out.println("===== caminho_completo_arquivos.properties: "+url.toString());
         }catch(Exception e){
             e.printStackTrace();
         }
@@ -37,6 +37,6 @@ System.out.println("===== caminho_completo_arquivos: "+caminho_completo_arquivos
 
     @Override
     public void contextDestroyed(ServletContextEvent sce) {
-        System.out.println("===== caminho_completo_arquivos: "+caminho_completo_arquivos);
+        System.out.println("===== Fechando contexto");
     }
 }

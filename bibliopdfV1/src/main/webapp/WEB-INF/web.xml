@@ -4,30 +4,6 @@
         <description>ServletContextListener</description>
         <listener-class>ufrj.bibliopdfv1.Iniciador</listener-class>
     </listener>
-    <servlet>
-        <servlet-name>ServletDeCatalogo</servlet-name>
-        <servlet-class>ufrj.bibliopdf.ServletDeCatalogo</servlet-class>
-    </servlet>
-    <servlet-mapping>
-        <servlet-name>ServletDeCatalogo</servlet-name>
-        <url-pattern>/catalogo</url-pattern>
-    </servlet-mapping>
-    <servlet>
-        <servlet-name>Logout</servlet-name>
-        <servlet-class>ufrj.bibliopdf.Logout</servlet-class>
-    </servlet>
-    <servlet-mapping>
-        <servlet-name>Logout</servlet-name>
-        <url-pattern>/logout</url-pattern>
-    </servlet-mapping>
-    <servlet>
-        <servlet-name>ServletDeDownload</servlet-name>
-        <servlet-class>ufrj.bibliopdf.ServletDeDownload</servlet-class>
-    </servlet>
-    <servlet-mapping>
-        <servlet-name>ServletDeDownload</servlet-name>
-        <url-pattern>/download</url-pattern>
-    </servlet-mapping>
     <security-constraint>
         <display-name>protegidoSecurityConstraint</display-name>
         <web-resource-collection>
@@ -35,23 +11,11 @@
             <description/>
             <url-pattern>/protegido/*</url-pattern>
         </web-resource-collection>
-        <auth-constraint>
-            <description/>
-            <role-name>admin</role-name>
-        </auth-constraint>
         <user-data-constraint>
             <description/>
             <transport-guarantee>CONFIDENTIAL</transport-guarantee>
         </user-data-constraint>
     </security-constraint>
-    <login-config>
-        <auth-method>FORM</auth-method>
-        <realm-name>bibliopdfRealm</realm-name>
-        <form-login-config>
-            <form-login-page>/login.jsp</form-login-page>
-            <form-error-page>/error.jsp</form-error-page>
-        </form-login-config>
-    </login-config>
     <security-role>
         <description/>
         <role-name>admin</role-name>
