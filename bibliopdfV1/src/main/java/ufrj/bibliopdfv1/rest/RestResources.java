@@ -37,7 +37,7 @@ public class RestResources {
     @GET
     @Path("searchbyid/{id}")
     @Produces(MediaType.APPLICATION_JSON)
-    public String getJson(@PathParam("id") String id) {
+    public String searchbyid(@PathParam("id") String id) {
         RespostaCompletaDTO respostaCompleta = null;
         respostaCompleta = new BiblioPDFDAO().searchbyid(id);
         return respostaCompleta.toString();

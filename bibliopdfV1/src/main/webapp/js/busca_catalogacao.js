@@ -538,6 +538,24 @@ function fazerPedidoPostAJAX(sendData,destino,callBack) {
     objPedidoAJAX.send(data);
 }
 //------------------------------------------------------------------------------
+function fazerPedidoGetAJAX(destino,callBack) {
+    
+    dialogoCatalogacao.escreverMensagem(null,'');
+    dialogoBusca.escreverMensagem(null,'');
+    
+    document.getElementById("idLoading1").setAttribute("class", "loading");
+    document.getElementById("idLoading2").setAttribute("class", "loading");
+    
+//alert(JSON.stringify(sendData));        
+    var objPedidoAJAX = new XMLHttpRequest();
+    objPedidoAJAX.open('GET', destino);
+    objPedidoAJAX.setRequestHeader("Content-Type", "application/json;charset=UTF-8");
+//    objPedidoAJAX.timeout = 10000;
+    objPedidoAJAX.responseType = 'json';
+    objPedidoAJAX.onreadystatechange = function(){callBack(objPedidoAJAX);};
+    objPedidoAJAX.send(null);
+}
+//------------------------------------------------------------------------------
 function callBack(objPedidoAJAX) { //--- MODELO DE CALLBACK
     if (objPedidoAJAX.readyState === 4 && objPedidoAJAX.status === 200) {
         document.getElementById("idLoading1").removeAttribute("class");
@@ -551,6 +569,21 @@ function callBack(objPedidoAJAX) { //--- MODELO DE CALLBACK
 }
 //------------------------------------------------------------------------------
 function fazerPedidoBusca(pagina) {
+    var dados = camposEscolhidosDaBusca();
+    if(dados.resultadoOK===false){
+        dialogoBusca.escreverMensagem(dados.cor,dados.msg);
+        return;
+    }else{
+        dados.operacao = 'buscar';
+        dados.pagina = pagina;
+        fazerPedidoGetAJAX(
+            'protegido/rest/services/searchbyid/'+
+            document.getElementById("idpatrimonio2").value.trim()
+            ,respostaDaBusca);
+    }
+}
+//------------------------------------------------------------------------------
+function fazerPedidoBusca_OLD(pagina) {
     var dados = camposEscolhidosDaBusca();
     if(dados.resultadoOK===false){
         dialogoBusca.escreverMensagem(dados.cor,dados.msg);
