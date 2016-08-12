@@ -11,11 +11,23 @@
             <description/>
             <url-pattern>/protegido/*</url-pattern>
         </web-resource-collection>
+        <auth-constraint>
+            <description/>
+            <role-name>admin</role-name>
+        </auth-constraint>
         <user-data-constraint>
             <description/>
             <transport-guarantee>CONFIDENTIAL</transport-guarantee>
         </user-data-constraint>
     </security-constraint>
+    <login-config>
+        <auth-method>FORM</auth-method>
+        <realm-name>bibliopdfRealm</realm-name>
+        <form-login-config>
+            <form-login-page>/login.jsp</form-login-page>
+            <form-error-page>/error.jsp</form-error-page>
+        </form-login-config>
+    </login-config>
     <security-role>
         <description/>
         <role-name>admin</role-name>
@@ -23,6 +35,14 @@
     <welcome-file-list>
         <welcome-file>protegido/busca_catalogacao.jsp</welcome-file>
     </welcome-file-list>
+    <servlet>
+        <servlet-name>Logout</servlet-name>
+        <servlet-class>ufrj.bibliopdfv1.Logout</servlet-class>
+    </servlet>
+    <servlet-mapping>
+        <servlet-name>Logout</servlet-name>
+        <url-pattern>/logout</url-pattern>
+    </servlet-mapping>
     <session-config>
         <session-timeout>
             30

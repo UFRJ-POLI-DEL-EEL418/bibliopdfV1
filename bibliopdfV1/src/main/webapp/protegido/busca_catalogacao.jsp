@@ -38,7 +38,11 @@
 
     <body>
         <div id="idDivCabecalho">
-            <form id="idFormSair" method="POST" action="http://localhost:8084/bibliopdf/logout">
+            <form id="idFormSair" method="POST" 
+                  action="<%=   new URL(request.getScheme(), 
+                                request.getServerName(), 
+                                request.getServerPort(), 
+                                request.getContextPath())%>/logout">
             <div id="menuSair"  class="Menu" onclick="document.getElementById('idFormSair').submit();">
                 SAIR
             </div>
