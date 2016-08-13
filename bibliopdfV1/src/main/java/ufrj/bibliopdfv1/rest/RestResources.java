@@ -1,5 +1,9 @@
 package ufrj.bibliopdfv1.rest;
 
+import java.io.BufferedReader;
+import java.io.InputStreamReader;
+import java.io.StringReader;
+import javax.json.Json;
 import javax.ws.rs.core.Context;
 import javax.ws.rs.core.UriInfo;
 import javax.ws.rs.Consumes;
@@ -11,6 +15,11 @@ import javax.ws.rs.PathParam;
 import javax.ws.rs.core.MediaType;
 import ufrj.bibliopdfv1.dao.BiblioPDFDAO;
 import ufrj.bibliopdfv1.dto.RespostaCompletaDTO;
+import javax.json.JsonObject;
+import javax.json.JsonReader;
+import javax.servlet.http.HttpServletRequest;
+import javax.servlet.http.HttpServletResponse;
+import javax.ws.rs.POST;
 
 @Path("services")
 public class RestResources {
@@ -19,13 +28,6 @@ public class RestResources {
     private UriInfo context;
 
     public RestResources() {
-    }
-
-    @GET
-    @Path("get")
-    @Produces(MediaType.APPLICATION_JSON)
-    public String getJson() {
-        return "{\"msg\":\"OK\"}";
     }
 
     @PUT
@@ -41,6 +43,44 @@ public class RestResources {
         RespostaCompletaDTO respostaCompleta = null;
         respostaCompleta = new BiblioPDFDAO().searchbyid(id);
         return respostaCompleta.toString();
+    }
+    
+    @GET
+    @Path("searchbyid")
+    @Produces(MediaType.APPLICATION_JSON)
+    public String searchbyid() {
+        RespostaCompletaDTO respostaCompleta = null;
+        respostaCompleta = new BiblioPDFDAO().getall();
+        return respostaCompleta.toString();
+    }
+    
+    @POST
+    @Path("compositesearch")
+    @Consumes(MediaType.APPLICATION_JSON)
+    @Produces(MediaType.APPLICATION_JSON)
+    public String compositesearch(
+                        @Context HttpServletRequest request,
+                        @Context HttpServletResponse response) {
+        RespostaCompletaDTO respostaCompleta = 
+                new BiblioPDFDAO().compositeSearch(getRequestJson(request));
+        return respostaCompleta.toString();
+    }
+    
+    private JsonObject getRequestJson(HttpServletRequest request){
+        JsonObject jsonDoPedido = null;
+        try{
+            BufferedReader br = new BufferedReader(
+                                    new InputStreamReader(
+                                            request.getInputStream(),"UTF8"));
+            String json = br.readLine();
+            br.close();
+            JsonReader reader = Json.createReader(new StringReader(json));
+            jsonDoPedido = reader.readObject();
+            reader.close();
+        }catch(Exception e){
+            e.printStackTrace();
+        }
+        return jsonDoPedido;
     }
     
 }

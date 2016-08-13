@@ -20,7 +20,7 @@ public class BiblioPDFDAO extends BaseDAO {
         return yes;
     }
 //------------------------------------------------------------------------------
-    public RespostaCompletaDTO buscarComposicao(JsonObject dados){
+    public RespostaCompletaDTO compositeSearch(JsonObject dados){
         RespostaCompletaDTO listaRefsDTO = new RespostaCompletaDTO();
         RespostaDTO umaRefDTO = null;
 
@@ -126,14 +126,16 @@ System.out.println("-----------------------\n"+comandoSQL+"\n");
     private String prepararComandoSQL3(JsonObject dados){
        
         String inicioComando = 
-        "select T6.patrimonio, T6.titulo, T6.autoria, T6.veiculo, T6.nomeoriginalarquivo,"+
-        " T6.data_publicacao,"+
-        " sum(dm) as nrohits \nfrom (";
+        "select T6.patrimonio, T6.titulo, T6.autoria, T6.veiculo,"+
+        " T6.nomeoriginalarquivo, T6.data_publicacao,"+
+        " sum(dm) as nrohits from (\n";
 
         String inicioOpcaoTitulo =     
-        "(select T1.patrimonio, T1.titulo, T1.autoria, T1.veiculo, T1.nomeoriginalarquivo, T1.data_publicacao,\n"+
+        "(select T1.patrimonio, T1.titulo, T1.autoria, T1.veiculo,"+
+        " T1.nomeoriginalarquivo, T1.data_publicacao,\n"+
         "(count(*)) AS dm from dadoscatalogo T1 \n"+
-        "inner join palavrastitulonormal T2 on (T1.patrimonio=T2.patrimonio) where \n";
+        "inner join palavrastitulonormal T2 on (T1.patrimonio=T2.patrimonio) "+
+        "where \n";
         
         String parametroTitulo = 
         "T2.palavra_titulo_normal like ? \n";
@@ -141,41 +143,50 @@ System.out.println("-----------------------\n"+comandoSQL+"\n");
         String or = "OR \n";        
         
         String fimOpcaoTitulo = 
-        "group by T1.patrimonio, T1.titulo, T1.autoria, T1.veiculo, T1.nomeoriginalarquivo, T1.data_publicacao) \n";
+        "group by T1.patrimonio, T1.titulo, T1.autoria, T1.veiculo, "+
+        "T1.nomeoriginalarquivo, T1.data_publicacao) \n";
 
         String union = "union all\n";
         
         String inicioOpcaoAutoria = 
-        "(select T1.patrimonio, T1.titulo, T1.autoria, T1.veiculo, T1.nomeoriginalarquivo, T1.data_publicacao,\n"+
+        "(select T1.patrimonio, T1.titulo, T1.autoria, T1.veiculo, "+
+        "T1.nomeoriginalarquivo, T1.data_publicacao,\n"+
         "(count(*)) AS dm from dadoscatalogo T1 \n"+
-        "inner join palavrasautorianormal T3 on (T1.patrimonio=T3.patrimonio) where \n";
+        "inner join palavrasautorianormal T3 on (T1.patrimonio=T3.patrimonio) "+
+        "where \n";
         
         String parametroAutoria = 
         "T3.palavra_autoria_normal like ? \n";
         
         String fimOpcaoAutoria = 
-        "group by T1.patrimonio, T1.titulo, T1.autoria, T1.veiculo, T1.nomeoriginalarquivo, T1.data_publicacao) \n";
+        "group by T1.patrimonio, T1.titulo, T1.autoria, T1.veiculo, "+
+        "T1.nomeoriginalarquivo, T1.data_publicacao) \n";
 
         String inicioOpcaoVeiculo = 
-        "(select T1.patrimonio, T1.titulo, T1.autoria, T1.veiculo, T1.nomeoriginalarquivo, T1.data_publicacao, \n"+
+        "(select T1.patrimonio, T1.titulo, T1.autoria, T1.veiculo, "+
+        "T1.nomeoriginalarquivo, T1.data_publicacao, \n"+
         "(count(*)) AS dm from dadoscatalogo T1 \n"+
-        "inner join palavrasveiculonormal T4 on (T1.patrimonio=T4.patrimonio) where \n";
+        "inner join palavrasveiculonormal T4 on (T1.patrimonio=T4.patrimonio) "+
+        "where \n";
         
         String parametroVeiculo = 
         "T4.palavra_veiculo_normal like ? \n";
         
         String fimOpcaoVeiculo = 
-        "group by T1.patrimonio, T1.titulo, T1.autoria, T1.veiculo, T1.nomeoriginalarquivo, T1.data_publicacao) \n";
+        "group by T1.patrimonio, T1.titulo, T1.autoria, T1.veiculo, "+
+        "T1.nomeoriginalarquivo, T1.data_publicacao) \n";
 
         String opcaoDataPublicacao =
-        "(select T1.patrimonio, T1.titulo, T1.autoria, T1.veiculo, T1.nomeoriginalarquivo, T1.data_publicacao,\n"+
+        "(select T1.patrimonio, T1.titulo, T1.autoria, T1.veiculo, "+
+        "T1.nomeoriginalarquivo, T1.data_publicacao,\n"+
         "(count(*)) AS dm from dadoscatalogo T1 where \n"+
         "T1.data_publicacao>= ? and T1.data_publicacao<= ? \n"+
-        "group by T1.patrimonio, T1.titulo, T1.autoria, T1.veiculo, T1.nomeoriginalarquivo, T1.data_publicacao) \n";
+        "group by T1.patrimonio, T1.titulo, T1.autoria, T1.veiculo, "+
+        "T1.nomeoriginalarquivo, T1.data_publicacao) \n";
 
         String inicioOpcaoPalChave = 
-        "(select T1.patrimonio, T1.titulo, T1.autoria, T1.veiculo, T1.nomeoriginalarquivo, \n"+
-        "T1.data_publicacao, \n"+
+        "(select T1.patrimonio, T1.titulo, T1.autoria, T1.veiculo, "+
+        "T1.nomeoriginalarquivo, T1.data_publicacao, \n"+
         "(count(*)) AS dm from dadoscatalogo T1 \n"+
         "inner join palavras_chave T5 on (T1.patrimonio=T5.patrimonio) where \n";
         
@@ -183,7 +194,8 @@ System.out.println("-----------------------\n"+comandoSQL+"\n");
         "T5.palchavenormal = ? \n";
         
         String fimOpcaoPalChave =
-        "group by T1.patrimonio, T1.titulo, T1.autoria, T1.veiculo, T1.nomeoriginalarquivo, T1.data_publicacao) \n";
+        "group by T1.patrimonio, T1.titulo, T1.autoria, T1.veiculo, "+
+        "T1.nomeoriginalarquivo, T1.data_publicacao) \n";
 
         String fimComando =     
         ") as T6 group by 1,2,3,4,5,6 ORDER BY nrohits DESC,titulo ASC;";
@@ -206,7 +218,9 @@ System.out.println("-----------------------\n"+comandoSQL+"\n");
         }
         
         if(contains(keys,"titulo")&&
-                (contains(keys,"autoria")||contains(keys,"veiculo")||contains(keys,"data_publicacao1"))){
+                (   contains(keys,"autoria")||
+                    contains(keys,"veiculo")||
+                    contains(keys,"data_publicacao1"))){
             comando = comando + union;
         }
         
@@ -222,7 +236,8 @@ System.out.println("-----------------------\n"+comandoSQL+"\n");
             comando = comando + fimOpcaoAutoria;
         }
         
-        if(contains(keys,"autoria") && (contains(keys,"veiculo")||contains(keys,"data_publicacao1"))){
+        if(  contains(keys,"autoria") && 
+            (contains(keys,"veiculo")||contains(keys,"data_publicacao1"))){
             comando = comando + union;
         }
         
@@ -288,139 +303,6 @@ System.out.println("-----------------------\n"+comandoSQL+"\n");
         return temp;    
     }
 //------------------------------------------------------------------------------ 
-    public RespostaCompletaDTO buscarTodos() {
-        RespostaCompletaDTO listaRefsDTO = new RespostaCompletaDTO();
-        RespostaDTO umaRefDTO = new RespostaDTO();
-        Connection conexao = null;
-        try {
-            conexao = getConnection();
-            PreparedStatement comandoSQL = conexao.prepareStatement(
-                    "SELECT * FROM dadoscatalogo ORDER BY patrimonio;");
-
-            ResultSet rs = comandoSQL.executeQuery();
-            long patrimonio = 0L;
-            while(rs.next()){
-                patrimonio = rs.getLong("patrimonio");
-                umaRefDTO = new RespostaDTO();
-                umaRefDTO.setPatrimonio(Long.toString(patrimonio));
-                umaRefDTO.setTitulo(rs.getString("titulo"));
-                umaRefDTO.setAutoria(rs.getString("autoria"));
-                umaRefDTO.setVeiculo(rs.getString("veiculo"));
-                umaRefDTO.setNomeOriginalArquivo(rs.getString("nomeoriginalarquivo"));
-                umaRefDTO.setData_publicacao(rs.getString("data_publicacao"));
-                umaRefDTO.setNrohits("1");
-                umaRefDTO.setPalchave(buscarPalavrasChave(patrimonio));
-//System.out.println("=== RefDTO: "+umaRefDTO.toString());                
-                listaRefsDTO.addResposta(umaRefDTO);
-            }
-        } catch (Exception e) {
-            umaRefDTO.setPatrimonio("0");
-            umaRefDTO.setTitulo("ERRO");
-            e.printStackTrace();
-        }
-
-        try {
-            if (conexao != null) {
-                conexao.close();
-            }
-        } catch (Exception e) {
-            e.printStackTrace();
-        }
-        return listaRefsDTO;
-    }
-//------------------------------------------------------------------------------ 
-    // TESTADO
-    public RespostaCompletaDTO buscarPorPatrimonio(JsonObject dados) {
-        RespostaCompletaDTO listaRefsDTO = new RespostaCompletaDTO();
-        RespostaDTO umaRefDTO = new RespostaDTO();
-        Connection conexao = null;
-        try {
-            conexao = getConnection();
-            PreparedStatement comandoSQL = conexao.prepareStatement(
-                    "SELECT * FROM dadoscatalogo WHERE patrimonio=?;");
-
-            comandoSQL.setLong(1, Long.parseLong(dados.getString("patrimonio")));
-
-            ResultSet rs = comandoSQL.executeQuery();
-            long patrimonio = 0L;
-            if (rs.next()) {
-                patrimonio = rs.getLong("patrimonio");
-                umaRefDTO.setPatrimonio(Long.toString(patrimonio));
-                umaRefDTO.setTitulo(rs.getString("titulo"));
-                umaRefDTO.setAutoria(rs.getString("autoria"));
-                umaRefDTO.setVeiculo(rs.getString("veiculo"));
-                umaRefDTO.setNomeOriginalArquivo(rs.getString("nomeoriginalarquivo"));
-                umaRefDTO.setData_publicacao(rs.getString("data_publicacao"));
-                umaRefDTO.setNrohits("1");
-                umaRefDTO.setPalchave(buscarPalavrasChave(patrimonio));
-//System.out.println("=== RefDTO: "+umaRefDTO.toString());                
-            } else {
-                umaRefDTO.setPatrimonio("0");
-                umaRefDTO.setTitulo("ERRO");
-            }
-        } catch (Exception e) {
-            umaRefDTO.setPatrimonio("0");
-            umaRefDTO.setTitulo("ERRO");
-            e.printStackTrace();
-        }
-
-        try {
-            if (conexao != null) {
-                conexao.close();
-            }
-        } catch (Exception e) {
-            e.printStackTrace();
-        }
-        listaRefsDTO.addResposta(umaRefDTO);
-        return listaRefsDTO;
-    }
-//------------------------------------------------------------------------------ 
-    // TESTADO
-    public RespostaCompletaDTO searchbyid(String id) {
-        RespostaCompletaDTO listaRefsDTO = new RespostaCompletaDTO();
-        RespostaDTO umaRefDTO = new RespostaDTO();
-        Connection conexao = null;
-        try {
-            conexao = getConnection();
-            PreparedStatement comandoSQL = conexao.prepareStatement(
-                    "SELECT * FROM dadoscatalogo WHERE patrimonio=?;");
-
-            comandoSQL.setLong(1, Long.parseLong(id));
-
-            ResultSet rs = comandoSQL.executeQuery();
-            long patrimonio = 0L;
-            if (rs.next()) {
-                patrimonio = rs.getLong("patrimonio");
-                umaRefDTO.setPatrimonio(Long.toString(patrimonio));
-                umaRefDTO.setTitulo(rs.getString("titulo"));
-                umaRefDTO.setAutoria(rs.getString("autoria"));
-                umaRefDTO.setVeiculo(rs.getString("veiculo"));
-                umaRefDTO.setNomeOriginalArquivo(rs.getString("nomeoriginalarquivo"));
-                umaRefDTO.setData_publicacao(rs.getString("data_publicacao"));
-                umaRefDTO.setNrohits("1");
-                umaRefDTO.setPalchave(buscarPalavrasChave(patrimonio));
-//System.out.println("=== RefDTO: "+umaRefDTO.toString());                
-            } else {
-                umaRefDTO.setPatrimonio("0");
-                umaRefDTO.setTitulo("ERRO");
-            }
-        } catch (Exception e) {
-            umaRefDTO.setPatrimonio("0");
-            umaRefDTO.setTitulo("ERRO");
-            e.printStackTrace();
-        }
-
-        try {
-            if (conexao != null) {
-                conexao.close();
-            }
-        } catch (Exception e) {
-            e.printStackTrace();
-        }
-        listaRefsDTO.addResposta(umaRefDTO);
-        return listaRefsDTO;
-    }
-//------------------------------------------------------------------------------
     public RespostaCompletaDTO salvarNovo(JsonObject dados) {
         RespostaCompletaDTO listaRefsDTO = new RespostaCompletaDTO();
         RespostaDTO umaRefDTO = new RespostaDTO();
@@ -549,7 +431,8 @@ System.out.println("-----------------------\n"+comandoSQL+"\n");
             
             // PRIMEIRA TABELA
             PreparedStatement comandoSQL = conexao.prepareStatement(
-            "UPDATE dadoscatalogo SET titulo=?, autoria=?, veiculo=?, data_publicacao=? "+
+            "UPDATE dadoscatalogo SET "+
+            "titulo=?, autoria=?, veiculo=?, data_publicacao=? "+
             "WHERE patrimonio=?;");
             comandoSQL.setString(1, titulo);
             comandoSQL.setString(2, autoria);
@@ -702,7 +585,9 @@ System.out.println("-----------------------\n"+comandoSQL+"\n");
         return nomeoriginalarquivo;
     }
 //------------------------------------------------------------------------------
-    public boolean salvarNomeArquivo(String strPatrimonio, String nomeOriginalArquivo) {
+    public boolean salvarNomeArquivo(
+                        String strPatrimonio, 
+                        String nomeOriginalArquivo) {
         long patrimonio = Long.parseLong(strPatrimonio);
         
         try{
@@ -720,6 +605,92 @@ System.out.println("-----------------------\n"+comandoSQL+"\n");
             e.printStackTrace();
         }
         return false;
+    }
+//------------------------------------------------------------------------------
+    public RespostaCompletaDTO getall() {
+        RespostaCompletaDTO listaRefsDTO = new RespostaCompletaDTO();
+        RespostaDTO umaRefDTO = new RespostaDTO();
+        Connection conexao = null;
+        try {
+            conexao = getConnection();
+            PreparedStatement comandoSQL = conexao.prepareStatement(
+                    "SELECT * FROM dadoscatalogo ORDER BY patrimonio;");
+
+            ResultSet rs = comandoSQL.executeQuery();
+            long patrimonio = 0L;
+            while(rs.next()){
+                patrimonio = rs.getLong("patrimonio");
+                umaRefDTO = new RespostaDTO();
+                umaRefDTO.setPatrimonio(Long.toString(patrimonio));
+                umaRefDTO.setTitulo(rs.getString("titulo"));
+                umaRefDTO.setAutoria(rs.getString("autoria"));
+                umaRefDTO.setVeiculo(rs.getString("veiculo"));
+                umaRefDTO.setNomeOriginalArquivo(rs.getString("nomeoriginalarquivo"));
+                umaRefDTO.setData_publicacao(rs.getString("data_publicacao"));
+                umaRefDTO.setNrohits("1");
+                umaRefDTO.setPalchave(buscarPalavrasChave(patrimonio));
+//System.out.println("=== RefDTO: "+umaRefDTO.toString());                
+                listaRefsDTO.addResposta(umaRefDTO);
+            }
+        } catch (Exception e) {
+            umaRefDTO.setPatrimonio("0");
+            umaRefDTO.setTitulo("ERRO");
+            e.printStackTrace();
+        }
+
+        try {
+            if (conexao != null) {
+                conexao.close();
+            }
+        } catch (Exception e) {
+            e.printStackTrace();
+        }
+        return listaRefsDTO;
+    }
+//------------------------------------------------------------------------------ 
+    public RespostaCompletaDTO searchbyid(String id) {
+        RespostaCompletaDTO listaRefsDTO = new RespostaCompletaDTO();
+        RespostaDTO umaRefDTO = new RespostaDTO();
+        Connection conexao = null;
+        try {
+            conexao = getConnection();
+            PreparedStatement comandoSQL = conexao.prepareStatement(
+                    "SELECT * FROM dadoscatalogo WHERE patrimonio=?;");
+
+            comandoSQL.setLong(1, Long.parseLong(id));
+
+            ResultSet rs = comandoSQL.executeQuery();
+            long patrimonio = 0L;
+            if (rs.next()) {
+                patrimonio = rs.getLong("patrimonio");
+                umaRefDTO.setPatrimonio(Long.toString(patrimonio));
+                umaRefDTO.setTitulo(rs.getString("titulo"));
+                umaRefDTO.setAutoria(rs.getString("autoria"));
+                umaRefDTO.setVeiculo(rs.getString("veiculo"));
+                umaRefDTO.setNomeOriginalArquivo(rs.getString("nomeoriginalarquivo"));
+                umaRefDTO.setData_publicacao(rs.getString("data_publicacao"));
+                umaRefDTO.setNrohits("1");
+                umaRefDTO.setPalchave(buscarPalavrasChave(patrimonio));
+//System.out.println("=== RefDTO: "+umaRefDTO.toString());                
+            } else {
+                umaRefDTO.setPatrimonio("0");
+                umaRefDTO.setTitulo("ERRO");
+            }
+        } catch (Exception e) {
+            umaRefDTO.setPatrimonio("0");
+            umaRefDTO.setTitulo("ERRO");
+            e.printStackTrace();
+        }
+
+        try {
+            if (conexao != null) {
+                conexao.close();
+            }
+        } catch (Exception e) {
+            e.printStackTrace();
+        }
+        listaRefsDTO.addResposta(umaRefDTO);
+        return listaRefsDTO;
     }
 //------------------------------------------------------------------------------
 }

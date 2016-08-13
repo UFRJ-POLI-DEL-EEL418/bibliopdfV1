@@ -574,12 +574,19 @@ function fazerPedidoBusca(pagina) {
         dialogoBusca.escreverMensagem(dados.cor,dados.msg);
         return;
     }else{
-        dados.operacao = 'buscar';
-        dados.pagina = pagina;
-        fazerPedidoGetAJAX(
-            'protegido/rest/services/searchbyid/'+
-            document.getElementById("idpatrimonio2").value.trim()
-            ,respostaDaBusca);
+        if(dados.tipoBusca === "patrimonio"){
+            fazerPedidoGetAJAX(
+                'protegido/rest/services/searchbyid/'+dados.patrimonio
+                ,respostaDaBusca);
+        }else if(dados.tipoBusca === "all"){
+            fazerPedidoGetAJAX(
+                'protegido/rest/services/searchbyid'
+                ,respostaDaBusca);
+        }else if(dados.tipoBusca === "composta"){
+//        dados.operacao = 'buscar';
+//        dados.pagina = pagina;
+            fazerPedidoPostAJAX(dados,'protegido/rest/services/compositesearch',respostaDaBusca);
+        }
     }
 }
 //------------------------------------------------------------------------------
