@@ -5,21 +5,19 @@
         url="jdbc:postgresql://127.0.0.1:5432/usuariossenhas"
         username="postgres"
         password="abracadabra"
-
         auth="Container"
         driverClassName="org.postgresql.Driver"
-        logAbandoned="false"
-        maxActive="20"
-        maxIdle="10"
-        maxWait="-1"
-        removeAbandoned="true"
-        removeAbandonedTimeout="60"
         type="javax.sql.DataSource"
+
+        maxTotal="20"
+        maxWaitMillis="-1"
+        logAbandoned="false"
+        maxIdle="10"
+        removeAbandonedTimeout="60"
     />
 
     <Realm 
         name="bibliopdfRealm"  
-        debug="99"
         localDataSource="true"
         className="org.apache.catalina.realm.DataSourceRealm"
         dataSourceName="jdbc/authority"
@@ -36,14 +34,13 @@
         url="jdbc:postgresql://127.0.0.1:5432/bibliopdf2016"
         username="postgres"
         password="abracadabra"
-
         auth="Container"
         driverClassName="org.postgresql.Driver"
+        
+        maxTotal="20"
+        maxWaitMillis="-1"
         logAbandoned="false"
-        maxActive="20"
         maxIdle="10"
-        maxWait="-1"
-        removeAbandoned="true"
         removeAbandonedTimeout="60"
     />
 </Context>
