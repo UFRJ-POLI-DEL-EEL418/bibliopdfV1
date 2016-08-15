@@ -20,14 +20,15 @@ public class BiblioPDFDAO extends BaseDAO {
         return yes;
     }
 //------------------------------------------------------------------------------
-    public RespostaCompletaDTO compositeSearch(JsonObject dados){
+    public RespostaCompletaDTO compositeSearch(JsonObject dados,String offset){
         RespostaCompletaDTO listaRefsDTO = new RespostaCompletaDTO();
         RespostaDTO umaRefDTO = null;
 
         Set<String> okeys = dados.keySet();
         Object[] keys = okeys.toArray();
         
-        String preparedStatement = prepararComandoSQL3(dados);
+        String preparedStatement = prepararComandoSQL3(dados,offset);
+//System.out.println("--- [compositeSearch] String preparedStatement: "+preparedStatement);
 
         try(Connection conexao = getConnection()){
             
@@ -42,7 +43,8 @@ public class BiblioPDFDAO extends BaseDAO {
                 }
                 deslocamento = palavrasDoTitulo.length;
             }
-
+//System.out.println("=== [compositeSearch] deslocamento(depois de titulo): "+deslocamento);
+            
             if(contains(keys,"autoria")){
                 String[] palavrasDaAutoria = extrairPalavrasDeCampo(dados,"autoria");
                 for(int i=0;i<palavrasDaAutoria.length;i++){
@@ -50,7 +52,8 @@ public class BiblioPDFDAO extends BaseDAO {
                 }
                 deslocamento += palavrasDaAutoria.length;
             }
-            
+//System.out.println("=== [compositeSearch] deslocamento(depois de autoria): "+deslocamento);
+
             if(contains(keys,"veiculo")){
                 String[] palavrasDoVeiculo = extrairPalavrasDeCampo(dados,"veiculo");
                 for(int i=0;i<palavrasDoVeiculo.length;i++){
@@ -58,6 +61,14 @@ public class BiblioPDFDAO extends BaseDAO {
                 }
                 deslocamento += palavrasDoVeiculo.length;
             }
+//System.out.println("=== [compositeSearch] deslocamento(depois de veiculo): "+deslocamento);
+
+            if(contains(keys,"data_publicacao1")){
+                comandoSQL.setString(deslocamento+1, dados.getString("data_publicacao1"));
+                comandoSQL.setString(deslocamento+2, dados.getString("data_publicacao2"));
+                deslocamento += 2;
+            }
+//System.out.println("=== [compositeSearch] deslocamento(depois de data_publicacao 1 e 2): "+deslocamento);
 
             if(contains(keys,"palchave")){
                 String[] palChaveNormalizadas = separarPalChaveNormalizadas(dados);
@@ -66,13 +77,11 @@ public class BiblioPDFDAO extends BaseDAO {
                 }
                 deslocamento += palChaveNormalizadas.length;
             }
-           
-            if(contains(keys,"data_publicacao1")){
-                comandoSQL.setString(deslocamento+1, dados.getString("data_publicacao1"));
-                comandoSQL.setString(deslocamento+2, dados.getString("data_publicacao2"));
-            }
+//System.out.println("=== [compositeSearch] deslocamento(depois de palchave): "+deslocamento);
+
+            comandoSQL.setInt(deslocamento+1, Integer.parseInt(dados.getString("offset")));
             
-System.out.println("-----------------------\n"+comandoSQL+"\n");
+//System.out.println("-----------------------\n"+comandoSQL+"\n");
 
             long patrimonio = 0;
             ResultSet rs = comandoSQL.executeQuery();
@@ -123,7 +132,7 @@ System.out.println("-----------------------\n"+comandoSQL+"\n");
         return palChave;
     }
 //------------------------------------------------------------------------------    
-    private String prepararComandoSQL3(JsonObject dados){
+    private String prepararComandoSQL3(JsonObject dados, String offset){
        
         String inicioComando = 
         "select T6.patrimonio, T6.titulo, T6.autoria, T6.veiculo,"+
@@ -198,7 +207,8 @@ System.out.println("-----------------------\n"+comandoSQL+"\n");
         "T1.nomeoriginalarquivo, T1.data_publicacao) \n";
 
         String fimComando =     
-        ") as T6 group by 1,2,3,4,5,6 ORDER BY nrohits DESC,titulo ASC;";
+        ") as T6 group by 1,2,3,4,5,6 ORDER BY nrohits DESC,titulo ASC"+
+        " LIMIT 5 OFFSET ?;";
 
         Set<String> okeys = dados.keySet();
         Object[] keys = okeys.toArray();
@@ -217,14 +227,13 @@ System.out.println("-----------------------\n"+comandoSQL+"\n");
             comando = comando + fimOpcaoTitulo;
         }
         
-        if(contains(keys,"titulo")&&
-                (   contains(keys,"autoria")||
-                    contains(keys,"veiculo")||
-                    contains(keys,"data_publicacao1"))){
-            comando = comando + union;
-        }
         
         if(contains(keys,"autoria")){
+            
+            if(contains(keys,"titulo")){
+                comando = comando + union;
+            }
+            
             String[] palavrasDaAutoria = extrairPalavrasDeCampo(dados,"autoria");
             comando = comando + inicioOpcaoAutoria;
             for(int i=0;i<palavrasDaAutoria.length;i++){
@@ -236,12 +245,14 @@ System.out.println("-----------------------\n"+comandoSQL+"\n");
             comando = comando + fimOpcaoAutoria;
         }
         
-        if(  contains(keys,"autoria") && 
-            (contains(keys,"veiculo")||contains(keys,"data_publicacao1"))){
-            comando = comando + union;
-        }
-        
         if(contains(keys,"veiculo")){
+            
+            if( contains(keys,"titulo") ||
+                contains(keys,"autoria")    
+            ){
+                comando = comando + union;
+            }
+            
             String[] palavrasDoVeiculo = extrairPalavrasDeCampo(dados,"veiculo");
             comando = comando + inicioOpcaoVeiculo;
             for(int i=0;i<palavrasDoVeiculo.length;i++){
@@ -253,15 +264,30 @@ System.out.println("-----------------------\n"+comandoSQL+"\n");
             comando = comando + fimOpcaoVeiculo;
         }
         
-        if(contains(keys,"veiculo") && contains(keys,"data_publicacao1")){
-            comando = comando + union;
-        }
         
         if(contains(keys,"data_publicacao1")){
+            if( contains(keys,"titulo") ||
+                contains(keys,"autoria") ||
+                contains(keys,"veiculo")    
+            ){
+                comando = comando + union;
+            }
             comando = comando + opcaoDataPublicacao;
         }
         
+
         if(contains(keys,"palchave")){
+
+            if( contains(keys,"titulo") ||
+                contains(keys,"autoria") ||
+                contains(keys,"veiculo") ||
+                contains(keys,"data_publicacao1")    
+            ){
+                comando = comando + union;
+            }
+
+
+
             String[] palChaveNormalizadas = separarPalChaveNormalizadas(dados);
             comando = comando + inicioOpcaoPalChave;
             for(int i=0;i<palChaveNormalizadas.length;i++){
@@ -607,14 +633,15 @@ System.out.println("-----------------------\n"+comandoSQL+"\n");
         return false;
     }
 //------------------------------------------------------------------------------
-    public RespostaCompletaDTO getall() {
+    public RespostaCompletaDTO getall(String offset) {
         RespostaCompletaDTO listaRefsDTO = new RespostaCompletaDTO();
         RespostaDTO umaRefDTO = new RespostaDTO();
         Connection conexao = null;
         try {
             conexao = getConnection();
             PreparedStatement comandoSQL = conexao.prepareStatement(
-                    "SELECT * FROM dadoscatalogo ORDER BY patrimonio;");
+            "SELECT * FROM dadoscatalogo ORDER BY patrimonio LIMIT 5 OFFSET ?;");
+            comandoSQL.setInt(1, Integer.parseInt(offset));
 
             ResultSet rs = comandoSQL.executeQuery();
             long patrimonio = 0L;

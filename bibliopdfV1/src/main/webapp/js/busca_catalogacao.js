@@ -251,8 +251,8 @@ function camposEscolhidosDaBusca() {
     var campos = {};
 
     paginaAtual = document.getElementById("idPaginaDestino").value;
-    var offset = paginaAtual;
-    campos.offset = offset.toString();
+    var offsetStr = Number(paginaAtual) * TAMANHO_DA_PAGINA_DE_RESULTADOS;
+    campos.offset = offsetStr.toString();
 
     campos.resultadoOK = false;
     if (controleDeChecks.patrimonio.checked) {
@@ -568,7 +568,7 @@ function callBack(objPedidoAJAX) { //--- MODELO DE CALLBACK
     }
 }
 //------------------------------------------------------------------------------
-function fazerPedidoBusca(pagina) {
+function fazerPedidoBusca() {
     var dados = camposEscolhidosDaBusca();
     if(dados.resultadoOK===false){
         dialogoBusca.escreverMensagem(dados.cor,dados.msg);
@@ -576,16 +576,17 @@ function fazerPedidoBusca(pagina) {
     }else{
         if(dados.tipoBusca === "patrimonio"){
             fazerPedidoGetAJAX(
-                'protegido/rest/services/searchbyid/'+dados.patrimonio
-                ,respostaDaBusca);
+                'protegido/rest/services/searchbyid/'+dados.offset+'/'+dados.patrimonio,
+                respostaDaBusca);
         }else if(dados.tipoBusca === "all"){
             fazerPedidoGetAJAX(
-                'protegido/rest/services/searchbyid'
-                ,respostaDaBusca);
+                'protegido/rest/services/searchbyid/'+dados.offset,
+                respostaDaBusca);
         }else if(dados.tipoBusca === "composta"){
 //        dados.operacao = 'buscar';
 //        dados.pagina = pagina;
-            fazerPedidoPostAJAX(dados,'protegido/rest/services/compositesearch',respostaDaBusca);
+            fazerPedidoPostAJAX(dados,'protegido/rest/services/compositesearch/'+dados.offset,
+            respostaDaBusca);
         }
     }
 }

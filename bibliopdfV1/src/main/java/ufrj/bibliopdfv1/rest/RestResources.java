@@ -37,32 +37,35 @@ public class RestResources {
     }
     
     @GET
-    @Path("searchbyid/{id}")
+    @Path("searchbyid/{offset}/{id}")
     @Produces(MediaType.APPLICATION_JSON)
-    public String searchbyid(@PathParam("id") String id) {
+    public String searchbyid(
+            @PathParam("offset") String offset,
+            @PathParam("id") String id) {
         RespostaCompletaDTO respostaCompleta = null;
         respostaCompleta = new BiblioPDFDAO().searchbyid(id);
         return respostaCompleta.toString();
     }
     
     @GET
-    @Path("searchbyid")
+    @Path("searchbyid/{offset}")
     @Produces(MediaType.APPLICATION_JSON)
-    public String searchbyid() {
+    public String searchbyid(@PathParam("offset") String offset) {
         RespostaCompletaDTO respostaCompleta = null;
-        respostaCompleta = new BiblioPDFDAO().getall();
+        respostaCompleta = new BiblioPDFDAO().getall(offset);
         return respostaCompleta.toString();
     }
     
     @POST
-    @Path("compositesearch")
+    @Path("compositesearch/{offset}")
     @Consumes(MediaType.APPLICATION_JSON)
     @Produces(MediaType.APPLICATION_JSON)
     public String compositesearch(
+                        @PathParam("offset") String offset,
                         @Context HttpServletRequest request,
                         @Context HttpServletResponse response) {
         RespostaCompletaDTO respostaCompleta = 
-                new BiblioPDFDAO().compositeSearch(getRequestJson(request));
+                new BiblioPDFDAO().compositeSearch(getRequestJson(request),offset);
         return respostaCompleta.toString();
     }
     
