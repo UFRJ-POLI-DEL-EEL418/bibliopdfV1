@@ -28,9 +28,9 @@ var controleDoMenu;
 var estadoEditando = false;
 var itemAtual;
 var respJsonAtual;
-var paginaAtual = 0;
 var dialogoBusca;
 var dialogoCatalogacao;
+var controlePaginacao;
 
 //=============== FUNÇÃO main() ================================================
 function main() {
@@ -38,6 +38,7 @@ function main() {
     dialogoCatalogacao = new ObjDialogo('idMsgDialogo3');
     controleDoMenu = new ControleDoMenu();
     controleDeChecks = new ControleDeChecks();
+    controlePaginacao = ObjControlePaginacao();
     limparPaginaDeBuscas();
     limparPaginaDeCatalogacao();
 
@@ -46,9 +47,7 @@ function main() {
     //  1. BUSCAR+dadosDaBusca
     document.getElementById('idBuscar').addEventListener("click",fazerPedidoBusca);
 //  2. PAGINA_ANTERIOR+nroPagina
-    document.getElementById('idPagAnterior').addEventListener("click",mostrarPaginaAnterior);
 //  3. PROXIMA_PAGINA+nroPagina
-    document.getElementById('idPagProxima').addEventListener("click",mostrarProximaPagina);
 //  5. LIMPAR_BUSCA
     document.getElementById('idLimparBusca').addEventListener("click",limparPaginaDeBuscas);
 //  7. MUDAR_PARA_CATALOGACAO
@@ -819,37 +818,6 @@ function controleDeEditar() {
     mudarAtributosEditando(estadoEditando);
 }
 //------------------------------------------------------------------------------
-function mostrarPaginaAnterior() {
-    if (respJsonAtual !== null &&
-        paginaAtual !== null &&
-        paginaAtual > 0) {
-    
-        paginaAtual--;
-        document.getElementById("idPaginaDestino").value = paginaAtual;
-        fazerPedidoBusca(paginaAtual);
-        dialogoBusca.escreverMensagem(
-                'mensagemDialogoVerde','Mostrando página anterior...');
-    } else {
-        dialogoBusca.escreverMensagem(
-                'mensagemDialogoVermelho','Não há pagina anterior.');
-    }
-}
-//------------------------------------------------------------------------------
-function mostrarProximaPagina() {
-    if (respJsonAtual !== null &&
-        paginaAtual !== null) {
-    
-        paginaAtual++;
-        document.getElementById("idPaginaDestino").value = paginaAtual;
-        fazerPedidoBusca(paginaAtual);
-        dialogoBusca.escreverMensagem(
-                'mensagemDialogoVerde','Mostrando próxima página...');
-    } else {
-        dialogoBusca.escreverMensagem(
-                'mensagemDialogoVermelho','Não há próxima pagina.');
-    }
-}
-//------------------------------------------------------------------------------
 function excluirItemAtual(){
     var dadoPedido = {};
     dadoPedido.patrimonio = document.getElementById('idpatrimonio3').value;
@@ -998,6 +966,50 @@ var ObjDialogo = function (id) {
             this.elementoDialogo.setAttribute('class', classeDaCor);
         }
     };
+};
+
+var ObjControlePaginacao = function(){
+    this.paginaAtual = 0;
+
+    
+    document.getElementById('idPagAnterior').addEventListener("click",mostrarPaginaAnterior);
+    document.getElementById('idPagProxima').addEventListener("click",mostrarProximaPagina);
+//------------------------------------------------------------------------------
+    function mostrarPaginaAnterior() {
+        if (respJsonAtual !== null &&
+            paginaAtual !== null &&
+            paginaAtual > 0) {
+
+            paginaAtual--;
+            document.getElementById("idPaginaDestino").value = paginaAtual;
+            fazerPedidoBusca(paginaAtual);
+            dialogoBusca.escreverMensagem(
+                    'mensagemDialogoVerde','Mostrando página anterior...');
+        } else {
+            dialogoBusca.escreverMensagem(
+                    'mensagemDialogoVermelho','Não há pagina anterior.');
+        }
+    }
+//------------------------------------------------------------------------------
+    function mostrarProximaPagina() {
+        var nroPaginas = Math.floor(respJsonAtual.nroRows/5);
+alert(nroPaginas);        
+        if (respJsonAtual !== null &&
+            paginaAtual !== null &&
+            paginaAtual < nroPaginas) {
+
+            paginaAtual++;
+            document.getElementById("idPaginaDestino").value = paginaAtual;
+            fazerPedidoBusca(paginaAtual);
+            dialogoBusca.escreverMensagem(
+                    'mensagemDialogoVerde','Mostrando próxima página...');
+        } else {
+            dialogoBusca.escreverMensagem(
+                    'mensagemDialogoVermelho','Não há próxima pagina.');
+        }
+    }
+//------------------------------------------------------------------------------
+    
 };
 
 //==============================================================================
