@@ -10,7 +10,8 @@ import javax.servlet.ServletContextListener;
 
 public class Iniciador implements ServletContextListener {
 
-    public static String caminho_completo_arquivos;
+    public static String FILES_DIRECTORY_FULL_PATH;
+    public static String NRO_ITEMS_PER_PAGE;
     
     @Override
     public void contextInitialized(ServletContextEvent sce) {
@@ -27,8 +28,10 @@ System.out.println("===== caminho_completo_arquivos.properties: "+url.toString()
         try (InputStream in = url.openStream()) {
             if(in!=null){
                 prop.load(in);
-                caminho_completo_arquivos = prop.getProperty("caminho_completo_arquivos");
-System.out.println("===== caminho_completo_arquivos: "+caminho_completo_arquivos);
+                FILES_DIRECTORY_FULL_PATH = prop.getProperty("FILES_DIRECTORY_FULL_PATH");
+System.out.println("===== FILES_DIRECTORY_FULL_PATH: "+FILES_DIRECTORY_FULL_PATH);
+                NRO_ITEMS_PER_PAGE = prop.getProperty("NRO_ITEMS_PER_PAGE");
+System.out.println("===== NRO_ITEMS_PER_PAGE: "+NRO_ITEMS_PER_PAGE);
             }
         }catch(IOException e){
             e.printStackTrace();

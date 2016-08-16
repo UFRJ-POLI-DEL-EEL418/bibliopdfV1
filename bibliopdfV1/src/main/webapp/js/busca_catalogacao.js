@@ -422,7 +422,7 @@ function popularTabelaDeResultados() {
         document.getElementById('tabelaBusca2').style.display = 'inline';
         if (respJsonAtual.arrayDeRespostas.length > 0) {
             document.getElementById('idTabelaResultados').innerHTML = "";
-            document.getElementById("idNroRows").innerHTML = respJsonAtual.nroRows;
+            document.getElementById("idNroRows").innerHTML = respJsonAtual.totalNroRows;
             document.getElementById("idPaginaDestino").value = paginaAtual;
             for (i = 0; i < respJsonAtual.arrayDeRespostas.length; i++) {
                 var elementoAimagem = document.createElement('a');
@@ -993,7 +993,7 @@ var ObjControlePaginacao = function(){
 //------------------------------------------------------------------------------
     function mostrarProximaPagina() {
         var nroPaginas = Math.floor(respJsonAtual.nroRows/5);
-alert(nroPaginas);        
+//alert(nroPaginas);        
         if (respJsonAtual !== null &&
             paginaAtual !== null &&
             paginaAtual < nroPaginas) {

@@ -11,7 +11,24 @@ public class RespostaCompletaDTO implements Serializable{
     
     private boolean sucesso;
     private int nroRows = 0;
+    private int totalNroRows = 0;
     private ArrayList<RespostaDTO> listaDeRespostas = new ArrayList<>();
+
+    public int getTotalNroRows() {
+        return totalNroRows;
+    }
+
+    public void setTotalNroRows(int totalNroRows) {
+        this.totalNroRows = totalNroRows;
+    }
+
+    public ArrayList<RespostaDTO> getListaDeRespostas() {
+        return listaDeRespostas;
+    }
+
+    public void setListaDeRespostas(ArrayList<RespostaDTO> listaDeRespostas) {
+        this.listaDeRespostas = listaDeRespostas;
+    }
 
     public Iterator getIterator(){
         return listaDeRespostas.iterator();
@@ -49,6 +66,7 @@ public class RespostaCompletaDTO implements Serializable{
         JsonObject jsonRspostaCompletaDTO = Json.createObjectBuilder()
             .add("sucesso",sucesso)
             .add("nroRows",(Integer.toString(nroRows)))
+            .add("totalNroRows",(Integer.toString(totalNroRows)))
             .add("arrayDeRespostas",jsonListaDeRespostas.build())
             .build();
         

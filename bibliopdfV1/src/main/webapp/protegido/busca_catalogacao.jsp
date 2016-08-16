@@ -178,7 +178,7 @@
                         &nbsp;
                     </td>
                     <td style="width:735px;">
-                        Nro. de registros encontrados:
+                        Nro. total de registros encontrados:
                         <span id="idNroRows">0</span>
                     </td>
                     <td style="width:300px;">
