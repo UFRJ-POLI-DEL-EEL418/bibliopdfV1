@@ -349,7 +349,7 @@
                     </td>
                     <td  class="alinha_esquerda" colspan="2">
                         <form id="idFormUpload">
-                            <input type="file" name="arquivoEnviado" id="idNomeArqUpload"/>
+                            <input type="file" name="htmlFileElementName" id="idNomeArqUpload"/>
                         </form>
                     </td>
                 </tr>

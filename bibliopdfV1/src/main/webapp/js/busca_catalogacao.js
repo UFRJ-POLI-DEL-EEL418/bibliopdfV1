@@ -103,7 +103,7 @@ function subirArquivo(){
     formData.append('patrimonio',patrimonio);
     
     var objPedidoAJAX = new XMLHttpRequest();
-    objPedidoAJAX.open('POST', 'protegido/rest/uploadfile/'+patrimonio,true);
+    objPedidoAJAX.open('POST', 'protegido/rest/services/uploadfile/'+patrimonio,true);
     // O próprio Browser deve preencher o cabeçalho!!!
 //    objPedidoAJAX.setRequestHeader("Content-Type", "multipart/form-data");
 //    objPedidoAJAX.responseType = "text";
@@ -537,6 +537,25 @@ function fazerPedidoPostAJAX(sendData,destino,callBack) {
     objPedidoAJAX.send(data);
 }
 //------------------------------------------------------------------------------
+function fazerPedidoPutAJAX(sendData,destino,callBack) {
+    
+    dialogoCatalogacao.escreverMensagem(null,'');
+    dialogoBusca.escreverMensagem(null,'');
+    
+    document.getElementById("idLoading1").setAttribute("class", "loading");
+    document.getElementById("idLoading2").setAttribute("class", "loading");
+    
+//alert(JSON.stringify(sendData));        
+    var data = JSON.stringify(sendData);
+    var objPedidoAJAX = new XMLHttpRequest();
+    objPedidoAJAX.open('PUT', destino);
+    objPedidoAJAX.setRequestHeader("Content-Type", "application/json;charset=UTF-8");
+//    objPedidoAJAX.timeout = 10000;
+    objPedidoAJAX.responseType = 'json';
+    objPedidoAJAX.onreadystatechange = function(){callBack(objPedidoAJAX);};
+    objPedidoAJAX.send(data);
+}
+//------------------------------------------------------------------------------
 function fazerPedidoGetAJAX(destino,callBack) {
     
     dialogoCatalogacao.escreverMensagem(null,'');
@@ -766,14 +785,14 @@ function salvarNovoItem() {
     var metadados = pegarMetadadosCatalogacao();
     metadados.operacao = "salvar_novo";
     metadados.tipoBusca = "null";
-    fazerPedidoPostAJAX(metadados,'catalogo',mostrarMsgConfirmacaoSalvar);
+    fazerPedidoPostAJAX(metadados,'protegido/rest/services/savenew',mostrarMsgConfirmacaoSalvar);
 }
 //------------------------------------------------------------------------------
 function salvarModifsItemAtual() {
     var metadados = pegarMetadadosCatalogacao();
     metadados.operacao = "salvar_modif";
     metadados.tipoBusca = "null";
-    fazerPedidoPostAJAX(metadados,'catalogo',mostrarMsgConfirmacaoSalvarModif);
+    fazerPedidoPutAJAX(metadados,'protegido/rest/services/savemodif/'+metadados.patrimonio,mostrarMsgConfirmacaoSalvarModif);
 }
 //------------------------------------------------------------------------------
 function mostrarItemAnterior() {
@@ -969,8 +988,7 @@ var ObjDialogo = function (id) {
 };
 
 var ObjControlePaginacao = function(){
-    this.paginaAtual = 0;
-
+    this.paginaAtual = 1;
     
     document.getElementById('idPagAnterior').addEventListener("click",mostrarPaginaAnterior);
     document.getElementById('idPagProxima').addEventListener("click",mostrarProximaPagina);
@@ -978,7 +996,7 @@ var ObjControlePaginacao = function(){
     function mostrarPaginaAnterior() {
         if (respJsonAtual !== null &&
             paginaAtual !== null &&
-            paginaAtual > 0) {
+            paginaAtual > 1) {
 
             paginaAtual--;
             document.getElementById("idPaginaDestino").value = paginaAtual;
@@ -992,8 +1010,8 @@ var ObjControlePaginacao = function(){
     }
 //------------------------------------------------------------------------------
     function mostrarProximaPagina() {
-        var nroPaginas = Math.floor(respJsonAtual.nroRows/5);
-//alert(nroPaginas);        
+        var nroPaginas = Math.floor(respJsonAtual.totalNroRows/5);
+alert(nroPaginas);        
         if (respJsonAtual !== null &&
             paginaAtual !== null &&
             paginaAtual < nroPaginas) {

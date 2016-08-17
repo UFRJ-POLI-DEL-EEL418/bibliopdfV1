@@ -3,6 +3,7 @@ package ufrj.bibliopdfv1.dao;
 import java.sql.Connection;
 import java.sql.PreparedStatement;
 import java.sql.ResultSet;
+import java.text.Normalizer;
 import java.util.Set;
 import javax.json.JsonObject;
 import ufrj.bibliopdfv1.dto.RespostaCompletaDTO;
@@ -33,7 +34,7 @@ public class BiblioPDFDAO extends BaseDAO {
 
         try(Connection conexao = getConnection()){
             
-            PreparedStatement comandoViewSQL = conexao.prepareStatement(preparedStatementView);
+            PreparedStatement comandoCountSQL = conexao.prepareStatement(preparedStatementView);
             PreparedStatement comandoSQL = conexao.prepareStatement(preparedStatement);
 
             int deslocamento = 0;
@@ -42,7 +43,7 @@ public class BiblioPDFDAO extends BaseDAO {
                 String[] palavrasDoTitulo = extrairPalavrasDeCampo(dados,"titulo");
                 for(int i=0;i<palavrasDoTitulo.length;i++){
                     comandoSQL.setString(i+1, palavrasDoTitulo[i]);
-                    comandoViewSQL.setString(i+1, palavrasDoTitulo[i]);
+                    comandoCountSQL.setString(i+1, palavrasDoTitulo[i]);
                 }
                 deslocamento = palavrasDoTitulo.length;
             }
@@ -52,7 +53,7 @@ public class BiblioPDFDAO extends BaseDAO {
                 String[] palavrasDaAutoria = extrairPalavrasDeCampo(dados,"autoria");
                 for(int i=0;i<palavrasDaAutoria.length;i++){
                     comandoSQL.setString(i+1+deslocamento, palavrasDaAutoria[i]);
-                    comandoViewSQL.setString(i+1+deslocamento, palavrasDaAutoria[i]);
+                    comandoCountSQL.setString(i+1+deslocamento, palavrasDaAutoria[i]);
                 }
                 deslocamento += palavrasDaAutoria.length;
             }
@@ -62,7 +63,7 @@ public class BiblioPDFDAO extends BaseDAO {
                 String[] palavrasDoVeiculo = extrairPalavrasDeCampo(dados,"veiculo");
                 for(int i=0;i<palavrasDoVeiculo.length;i++){
                     comandoSQL.setString(i+1+deslocamento, palavrasDoVeiculo[i]);
-                    comandoViewSQL.setString(i+1+deslocamento, palavrasDoVeiculo[i]);
+                    comandoCountSQL.setString(i+1+deslocamento, palavrasDoVeiculo[i]);
                 }
                 deslocamento += palavrasDoVeiculo.length;
             }
@@ -70,9 +71,9 @@ public class BiblioPDFDAO extends BaseDAO {
 
             if(contains(keys,"data_publicacao1")){
                 comandoSQL.setString(deslocamento+1, dados.getString("data_publicacao1"));
-                comandoViewSQL.setString(deslocamento+1, dados.getString("data_publicacao1"));
+                comandoCountSQL.setString(deslocamento+1, dados.getString("data_publicacao1"));
                 comandoSQL.setString(deslocamento+2, dados.getString("data_publicacao2"));
-                comandoViewSQL.setString(deslocamento+2, dados.getString("data_publicacao2"));
+                comandoCountSQL.setString(deslocamento+2, dados.getString("data_publicacao2"));
                 deslocamento += 2;
             }
 //System.out.println("=== [compositeSearch] deslocamento(depois de data_publicacao 1 e 2): "+deslocamento);
@@ -81,7 +82,7 @@ public class BiblioPDFDAO extends BaseDAO {
                 String[] palChaveNormalizadas = separarPalChaveNormalizadas(dados);
                 for(int i=0;i<palChaveNormalizadas.length;i++){
                     comandoSQL.setString(i+1+deslocamento, palChaveNormalizadas[i]);
-                    comandoViewSQL.setString(i+1+deslocamento, palChaveNormalizadas[i]);
+                    comandoCountSQL.setString(i+1+deslocamento, palChaveNormalizadas[i]);
                 }
                 deslocamento += palChaveNormalizadas.length;
             }
@@ -90,10 +91,12 @@ public class BiblioPDFDAO extends BaseDAO {
             comandoSQL.setInt(deslocamento+1, Integer.parseInt(dados.getString("offset")));
             
 System.out.println("  comandoSQL -----------------------\n"+comandoSQL+"\n");
-System.out.println("  comandoViewSQL -------------------\n"+comandoViewSQL+"\n");
+System.out.println("  comandoViewSQL -------------------\n"+comandoCountSQL+"\n");
 
-
-            ResultSet rs = comandoViewSQL.executeQuery();
+            // BEGIN TRANSACTION
+            conexao.setAutoCommit(false);
+            
+            ResultSet rs = comandoCountSQL.executeQuery();
             if(rs.next()){
                 listaRefsDTO.setTotalNroRows(rs.getInt(1));
 System.out.println("======== TOTAL NRO ROWS: "+listaRefsDTO.getTotalNroRows());
@@ -115,6 +118,10 @@ System.out.println("======== TOTAL NRO ROWS: "+listaRefsDTO.getTotalNroRows());
 //System.out.println("=== RefDTO: "+umaRefDTO.toString());                
                 listaRefsDTO.addResposta(umaRefDTO);
             }
+            
+            // END TRANSACTION
+            conexao.commit();
+            
         }catch(Exception e){
             e.printStackTrace();
         }
@@ -152,13 +159,13 @@ System.out.println("======== TOTAL NRO ROWS: "+listaRefsDTO.getTotalNroRows());
        
         String inicioComando = 
         "select T6.patrimonio, T6.titulo, T6.autoria, T6.veiculo,"+
-        " T6.nomeoriginalarquivo, T6.data_publicacao,"+
+        " T6.nomeoriginalarquivo, T6.data_publicacao, T6.titulonormal,"+
         " sum(dm) as nrohits from (\n";
 
         String inicioOpcaoTitulo =     
         "(select T1.patrimonio, T1.titulo, T1.autoria, T1.veiculo,"+
-        " T1.nomeoriginalarquivo, T1.data_publicacao,\n"+
-        "(count(*)) AS dm from dadoscatalogo T1 \n"+
+        " T1.nomeoriginalarquivo, T1.data_publicacao, T1.titulonormal,\n"+
+        " (count(*)) AS dm from dadoscatalogo T1 \n"+
         "inner join palavrastitulonormal T2 on (T1.patrimonio=T2.patrimonio) "+
         "where \n";
         
@@ -169,61 +176,61 @@ System.out.println("======== TOTAL NRO ROWS: "+listaRefsDTO.getTotalNroRows());
         
         String fimOpcaoTitulo = 
         "group by T1.patrimonio, T1.titulo, T1.autoria, T1.veiculo, "+
-        "T1.nomeoriginalarquivo, T1.data_publicacao) \n";
+        "T1.nomeoriginalarquivo, T1.data_publicacao, T1.titulonormal) \n";
 
         String union = "union all\n";
         
         String inicioOpcaoAutoria = 
         "(select T1.patrimonio, T1.titulo, T1.autoria, T1.veiculo, "+
-        "T1.nomeoriginalarquivo, T1.data_publicacao,\n"+
-        "(count(*)) AS dm from dadoscatalogo T1 \n"+
-        "inner join palavrasautorianormal T3 on (T1.patrimonio=T3.patrimonio) "+
-        "where \n";
+        " T1.nomeoriginalarquivo, T1.data_publicacao, T1.titulonormal,\n"+
+        " (count(*)) AS dm from dadoscatalogo T1 \n"+
+        " inner join palavrasautorianormal T3 on (T1.patrimonio=T3.patrimonio) "+
+        " where \n";
         
         String parametroAutoria = 
-        "T3.palavra_autoria_normal like ? \n";
+        " T3.palavra_autoria_normal like ? \n";
         
         String fimOpcaoAutoria = 
-        "group by T1.patrimonio, T1.titulo, T1.autoria, T1.veiculo, "+
-        "T1.nomeoriginalarquivo, T1.data_publicacao) \n";
+        " group by T1.patrimonio, T1.titulo, T1.autoria, T1.veiculo, "+
+        " T1.nomeoriginalarquivo, T1.data_publicacao, T1.titulonormal) \n";
 
         String inicioOpcaoVeiculo = 
-        "(select T1.patrimonio, T1.titulo, T1.autoria, T1.veiculo, "+
-        "T1.nomeoriginalarquivo, T1.data_publicacao, \n"+
-        "(count(*)) AS dm from dadoscatalogo T1 \n"+
-        "inner join palavrasveiculonormal T4 on (T1.patrimonio=T4.patrimonio) "+
-        "where \n";
+        "(select T1.patrimonio, T1.titulo, T1.autoria, T1.veiculo,"+
+        " T1.nomeoriginalarquivo, T1.data_publicacao, T1.titulonormal,\n"+
+        " (count(*)) AS dm from dadoscatalogo T1 \n"+
+        " inner join palavrasveiculonormal T4 on (T1.patrimonio=T4.patrimonio)"+
+        " where \n";
         
         String parametroVeiculo = 
         "T4.palavra_veiculo_normal like ? \n";
         
         String fimOpcaoVeiculo = 
         "group by T1.patrimonio, T1.titulo, T1.autoria, T1.veiculo, "+
-        "T1.nomeoriginalarquivo, T1.data_publicacao) \n";
+        "T1.nomeoriginalarquivo, T1.data_publicacao, T1.titulonormal) \n";
 
         String opcaoDataPublicacao =
         "(select T1.patrimonio, T1.titulo, T1.autoria, T1.veiculo, "+
-        "T1.nomeoriginalarquivo, T1.data_publicacao,\n"+
-        "(count(*)) AS dm from dadoscatalogo T1 where \n"+
-        "T1.data_publicacao>= ? and T1.data_publicacao<= ? \n"+
-        "group by T1.patrimonio, T1.titulo, T1.autoria, T1.veiculo, "+
-        "T1.nomeoriginalarquivo, T1.data_publicacao) \n";
+        " T1.nomeoriginalarquivo, T1.data_publicacao, T1.titulonormal,\n"+
+        " (count(*)) AS dm from dadoscatalogo T1 where \n"+
+        " T1.data_publicacao>= ? and T1.data_publicacao<= ? \n"+
+        " group by T1.patrimonio, T1.titulo, T1.autoria, T1.veiculo, "+
+        " T1.nomeoriginalarquivo, T1.data_publicacao) \n";
 
         String inicioOpcaoPalChave = 
         "(select T1.patrimonio, T1.titulo, T1.autoria, T1.veiculo, "+
-        "T1.nomeoriginalarquivo, T1.data_publicacao, \n"+
-        "(count(*)) AS dm from dadoscatalogo T1 \n"+
-        "inner join palavras_chave T5 on (T1.patrimonio=T5.patrimonio) where \n";
+        " T1.nomeoriginalarquivo, T1.data_publicacao, T1.titulonormal,\n"+
+        " (count(*)) AS dm from dadoscatalogo T1 \n"+
+        " inner join palavras_chave T5 on (T1.patrimonio=T5.patrimonio) where \n";
         
         String parametroPalChave =
         "T5.palchavenormal = ? \n";
         
         String fimOpcaoPalChave =
         "group by T1.patrimonio, T1.titulo, T1.autoria, T1.veiculo, "+
-        "T1.nomeoriginalarquivo, T1.data_publicacao) \n";
+        "T1.nomeoriginalarquivo, T1.data_publicacao, T1.titulonormal) \n";
 
         String fimComando =     
-        ") as T6 group by 1,2,3,4,5,6 ORDER BY nrohits DESC,titulo ASC"+
+        ") as T6 group by 1,2,3,4,5,6,7 ORDER BY nrohits DESC,titulonormal ASC"+
         " LIMIT 5 OFFSET ?;";
 
         Set<String> okeys = dados.keySet();
@@ -517,7 +524,27 @@ System.out.println("======== TOTAL NRO ROWS: "+listaRefsDTO.getTotalNroRows());
         return temp;    
     }
 //------------------------------------------------------------------------------ 
-    public RespostaCompletaDTO salvarNovo(JsonObject dados) {
+    private String normalizarTitulo(String titulo){
+        if (titulo == null || titulo.equals("")) return titulo;
+        titulo = titulo.trim();
+        titulo = titulo.replaceAll("\\s+", "");
+        final String decomposed = Normalizer.normalize(titulo, Normalizer.Form.NFD);
+        String saida = decomposed.replaceAll("\\p{InCombiningDiacriticalMarks}+", "");
+        saida = saida.toUpperCase();
+        saida = saida.replace("'","");
+        saida = saida.replace("´","");
+        saida = saida.replace("-","");
+        saida = saida.replace(":","");
+        saida = saida.replace("/","");
+        saida = saida.replace(".","");
+        saida = saida.replace(";","");
+        saida = saida.replace(",","");
+        saida = saida.replace("(","");
+        saida = saida.replace(")","");
+        return saida;
+    }
+//------------------------------------------------------------------------------ 
+    public RespostaCompletaDTO saveNew(JsonObject dados) {
         RespostaCompletaDTO listaRefsDTO = new RespostaCompletaDTO();
         RespostaDTO umaRefDTO = new RespostaDTO();
         ResultSet rst = null;
@@ -544,12 +571,14 @@ System.out.println("======== TOTAL NRO ROWS: "+listaRefsDTO.getTotalNroRows());
             
             // PRIMEIRA TABELA
             PreparedStatement comandoSQL = conexao.prepareStatement(
-            "INSERT INTO dadoscatalogo (titulo,autoria,veiculo,data_publicacao) "+
-            "VALUES(?,?,?,?) RETURNING patrimonio;");
+            "INSERT INTO dadoscatalogo "+
+            "(titulo,autoria,veiculo,data_publicacao,titulonormal) "+
+            "VALUES(?,?,?,?,?) RETURNING patrimonio;");
             comandoSQL.setString(1, titulo);
             comandoSQL.setString(2, autoria);
             comandoSQL.setString(3, veiculo);
             comandoSQL.setString(4, data_publicacao);
+            comandoSQL.setString(5, normalizarTitulo(titulo));
             rst = comandoSQL.executeQuery();
             rst.next();
             patrimonio = rst.getLong("patrimonio");
@@ -619,11 +648,12 @@ System.out.println("======== TOTAL NRO ROWS: "+listaRefsDTO.getTotalNroRows());
         return listaRefsDTO;
     }
 //------------------------------------------------------------------------------
-    public RespostaCompletaDTO salvarModif(JsonObject dados) {
+    public RespostaCompletaDTO saveModif(JsonObject dados, String id) {
         RespostaCompletaDTO listaRefsDTO = new RespostaCompletaDTO();
         RespostaDTO umaRefDTO = new RespostaDTO();
         ResultSet rst = null;
-        long patrimonio = Long.parseLong(dados.getString("patrimonio"));
+//        long patrimonio = Long.parseLong(dados.getString("patrimonio"));
+        long patrimonio = Long.parseLong(id);
         
         String titulo = dados.getString("titulo").trim();
         titulo = titulo.replaceAll("\\s+", " ");
@@ -646,13 +676,14 @@ System.out.println("======== TOTAL NRO ROWS: "+listaRefsDTO.getTotalNroRows());
             // PRIMEIRA TABELA
             PreparedStatement comandoSQL = conexao.prepareStatement(
             "UPDATE dadoscatalogo SET "+
-            "titulo=?, autoria=?, veiculo=?, data_publicacao=? "+
+            "titulo=?, autoria=?, veiculo=?, data_publicacao=? , titulonormal=?"+
             "WHERE patrimonio=?;");
             comandoSQL.setString(1, titulo);
             comandoSQL.setString(2, autoria);
             comandoSQL.setString(3, veiculo);
             comandoSQL.setString(4,data_publicacao);
-            comandoSQL.setLong(5, patrimonio);
+            comandoSQL.setString(5, normalizarTitulo(titulo));
+            comandoSQL.setLong(6, patrimonio);
             int count = comandoSQL.executeUpdate();
             if(count!=1){
                 listaRefsDTO.setSucesso(false);
