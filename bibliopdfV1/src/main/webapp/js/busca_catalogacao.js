@@ -248,7 +248,7 @@ function limparPaginaDeBuscas() {
     document.getElementById('idMsgDialogo2').innerHTML = "";
     document.getElementById('idTabelaResultados').innerHTML = "";
     document.getElementById('idNroRows').innerHTML = "0";
-    document.getElementById('idPaginaDestino').value = "0";
+    document.getElementById('idPaginaDestino').value = "1";
     document.getElementById('idMsgDialogo2').innerHTML = "";
     document.getElementById('idMsgDialogo2').removeAttribute('class');
     itemAtual = null;
@@ -313,9 +313,9 @@ function parseDate(id){
 function camposEscolhidosDaBusca() {
     var campos = {};
 
-    paginaAtual = document.getElementById("idPaginaDestino").value;
-    var offsetStr = Number(paginaAtual) * TAMANHO_DA_PAGINA_DE_RESULTADOS;
-    campos.offset = offsetStr.toString();
+    var paginaAtual = Number(document.getElementById("idPaginaDestino").value);
+    var offset = ((paginaAtual-1) * TAMANHO_DA_PAGINA_DE_RESULTADOS);
+    campos.offset = offset.toString();
 
     campos.resultadoOK = false;
     if (controleDeChecks.patrimonio.checked) {
@@ -475,7 +475,7 @@ function popularTabelaDeResultados() {
         if (respJsonAtual.arrayDeRespostas.length > 0) {
             document.getElementById('idTabelaResultados').innerHTML = "";
             document.getElementById("idNroRows").innerHTML = respJsonAtual.totalNroRows;
-            document.getElementById("idPaginaDestino").value = paginaAtual;
+//            document.getElementById("idPaginaDestino").value = paginaAtual;
             for (i = 0; i < respJsonAtual.arrayDeRespostas.length; i++) {
                 var elementoAimagem = document.createElement('a');
                 var elementoAtexto = document.createElement('a');
@@ -506,8 +506,8 @@ function popularTabelaDeResultados() {
             }
 
         } else {
-            paginaAtual--;
-            document.getElementById("idPaginaDestino").value = paginaAtual;
+//            paginaAtual--;
+//            document.getElementById("idPaginaDestino").value = paginaAtual;
             document.getElementById('idMsgDialogo2').innerHTML = "Não há próxima página";
             document.getElementById('idMsgDialogo2').setAttribute('class', 'mensagemDialogoAmarelo');
         }
@@ -640,6 +640,7 @@ function callBack(objPedidoAJAX) { //--- MODELO DE CALLBACK
 //------------------------------------------------------------------------------
 function fazerPedidoBusca() {
     var dados = camposEscolhidosDaBusca();
+//alert("Página atual: "+document.getElementById('idPaginaDestino').value+", Offset: "+dados.offset);    
     if(dados.resultadoOK===false){
         dialogoBusca.escreverMensagem(dados.cor,dados.msg);
         return;
@@ -1038,6 +1039,7 @@ var ObjControlePaginacao = function(){
     document.getElementById('idPagProxima').addEventListener("click",mostrarProximaPagina);
 //------------------------------------------------------------------------------
     function mostrarPaginaAnterior() {
+        paginaAtual = document.getElementById("idPaginaDestino").value;
         if (respJsonAtual !== null &&
             paginaAtual !== null &&
             paginaAtual > 1) {
@@ -1054,15 +1056,16 @@ var ObjControlePaginacao = function(){
     }
 //------------------------------------------------------------------------------
     function mostrarProximaPagina() {
-        var nroPaginas = Math.floor(respJsonAtual.totalNroRows/5);
-alert(nroPaginas);        
+        var nroPaginas = Math.floor((respJsonAtual.totalNroRows-1)/TAMANHO_DA_PAGINA_DE_RESULTADOS)+1;
+//alert(nroPaginas);        
+        paginaAtual = document.getElementById("idPaginaDestino").value;
         if (respJsonAtual !== null &&
             paginaAtual !== null &&
             paginaAtual < nroPaginas) {
 
             paginaAtual++;
             document.getElementById("idPaginaDestino").value = paginaAtual;
-            fazerPedidoBusca(paginaAtual);
+            fazerPedidoBusca();
             dialogoBusca.escreverMensagem(
                     'mensagemDialogoVerde','Mostrando próxima página...');
         } else {

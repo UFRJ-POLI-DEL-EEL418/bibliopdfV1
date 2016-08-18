@@ -943,6 +943,7 @@ System.out.println("Delete operation is failed.");
                     "SELECT * FROM dadoscatalogo ORDER BY patrimonio LIMIT 5 OFFSET ?;");
             comandoSQL.setInt(1, Integer.parseInt(offset));
 
+            conexao.setAutoCommit(false);
             ResultSet rs = comandoSQL.executeQuery();
             long patrimonio = 0L;
             while (rs.next()) {
@@ -959,6 +960,15 @@ System.out.println("Delete operation is failed.");
 //System.out.println("=== RefDTO: "+umaRefDTO.toString());                
                 listaRefsDTO.addResposta(umaRefDTO);
             }
+            comandoSQL = conexao.prepareStatement(
+                    "SELECT count(*) FROM dadoscatalogo;");
+            rs = comandoSQL.executeQuery();
+            if(rs.next()){
+                listaRefsDTO.setTotalNroRows(rs.getInt(1));    
+            }
+            
+            
+            conexao.commit();
         } catch (Exception e) {
             umaRefDTO.setPatrimonio("0");
             umaRefDTO.setTitulo("ERRO");
