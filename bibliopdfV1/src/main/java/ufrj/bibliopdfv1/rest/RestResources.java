@@ -22,6 +22,7 @@ import javax.json.JsonReader;
 import javax.servlet.http.HttpServletRequest;
 import javax.servlet.http.HttpServletResponse;
 import javax.servlet.http.Part;
+import javax.ws.rs.DELETE;
 import javax.ws.rs.POST;
 import ufrj.bibliopdfv1.Iniciador;
 
@@ -34,6 +35,24 @@ public class RestResources {
     public RestResources() {
     }
 
+    @DELETE
+    @Path("deletereference/{id}")
+    @Produces(MediaType.APPLICATION_JSON)
+    public String deleteReference(@PathParam("id") String id) {
+        RespostaCompletaDTO respostaCompleta = 
+                new BiblioPDFDAO().deleteReference(id);
+        return respostaCompleta.toString();
+    }
+    
+    @DELETE
+    @Path("deletefile/{id}")
+    @Produces(MediaType.APPLICATION_JSON)
+    public String deleteFile(@PathParam("id") String id) {
+        RespostaCompletaDTO respostaCompleta = 
+                new BiblioPDFDAO().deleteFile(id);
+        return respostaCompleta.toString();
+    }
+    
     @POST
     @Path("savenew")
     @Consumes(MediaType.APPLICATION_JSON)

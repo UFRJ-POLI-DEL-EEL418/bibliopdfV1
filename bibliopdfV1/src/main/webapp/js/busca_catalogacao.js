@@ -86,8 +86,72 @@ function mudarCorItemMenu(idMenu, bg, col) {
     document.getElementById(idMenu).style.setProperty('color', col);
 }
 //------------------------------------------------------------------------------
+function excluirItemAtual(){
+    dialogoCatalogacao.escreverMensagem(null,'');
+    dialogoBusca.escreverMensagem(null,'');
+    
+    document.getElementById("idLoading1").setAttribute("class", "loading");
+    document.getElementById("idLoading2").setAttribute("class", "loading");
+    
+    var patrimonio = document.getElementById('idpatrimonio3').value.trim();
+    
+    var objPedidoAJAX = new XMLHttpRequest();
+    objPedidoAJAX.open('DELETE', 'protegido/rest/services/deletereference/'+patrimonio,true);
+    // O próprio Browser deve preencher o cabeçalho!!!
+//    objPedidoAJAX.setRequestHeader("Content-Type", "multipart/form-data");
+    objPedidoAJAX.responseType = 'json';
+//    objPedidoAJAX.timeout = 10000;
+    objPedidoAJAX.onreadystatechange = function(){
+        document.getElementById("idLoading1").removeAttribute("class");
+        document.getElementById("idLoading2").removeAttribute("class");
+        if (objPedidoAJAX.readyState === 4 && objPedidoAJAX.status === 200) {
+//alert("=== objPedidoAJAX.responseText: "+objPedidoAJAX.responseText);                    
+            if(objPedidoAJAX.response.sucesso === true){
+                dialogoCatalogacao.escreverMensagem(
+                    'mensagemDialogoVerde',
+                    'Excluiu referência...');
+            }else{
+                dialogoCatalogacao.escreverMensagem(
+                    'mensagemDialogoVermelho',
+                    'Erro...Não excluiu a referência');
+            }
+        }
+    };
+    objPedidoAJAX.send();
+}
+//------------------------------------------------------------------------------
 function excluirArquivo(){
-    alert('EXCLUIR ARQUIVO');
+    dialogoCatalogacao.escreverMensagem(null,'');
+    dialogoBusca.escreverMensagem(null,'');
+    
+    document.getElementById("idLoading1").setAttribute("class", "loading");
+    document.getElementById("idLoading2").setAttribute("class", "loading");
+    
+    var patrimonio = document.getElementById('idpatrimonio3').value.trim();
+    
+    var objPedidoAJAX = new XMLHttpRequest();
+    objPedidoAJAX.open('DELETE', 'protegido/rest/services/deletefile/'+patrimonio,true);
+    // O próprio Browser deve preencher o cabeçalho!!!
+//    objPedidoAJAX.setRequestHeader("Content-Type", "multipart/form-data");
+    objPedidoAJAX.responseType = 'json';
+//    objPedidoAJAX.timeout = 10000;
+    objPedidoAJAX.onreadystatechange = function(){
+        document.getElementById("idLoading1").removeAttribute("class");
+        document.getElementById("idLoading2").removeAttribute("class");
+        if (objPedidoAJAX.readyState === 4 && objPedidoAJAX.status === 200) {
+//alert("=== objPedidoAJAX.responseText: "+objPedidoAJAX.responseText);                    
+            if(objPedidoAJAX.response.sucesso === true){
+                dialogoCatalogacao.escreverMensagem(
+                    'mensagemDialogoVerde',
+                    'Excluiu arquivo...');
+            }else{
+                dialogoCatalogacao.escreverMensagem(
+                    'mensagemDialogoVermelho',
+                    'Erro...Não excluiu o arquivo');
+            }
+        }
+    };
+    objPedidoAJAX.send();
 }
 //------------------------------------------------------------------------------
 function subirArquivo(){
@@ -835,14 +899,6 @@ function controleDeEditar() {
         estadoEditando = true;
     }
     mudarAtributosEditando(estadoEditando);
-}
-//------------------------------------------------------------------------------
-function excluirItemAtual(){
-    var dadoPedido = {};
-    dadoPedido.patrimonio = document.getElementById('idpatrimonio3').value;
-    dadoPedido.operacao = "excluir";
-    dadoPedido.tipoBusca = "null";
-    fazerPedidoPostAJAX(dadoPedido,'catalogo',mostrarMsgConfirmacaoExcluir);
 }
 //------------------------------------------------------------------------------
 
