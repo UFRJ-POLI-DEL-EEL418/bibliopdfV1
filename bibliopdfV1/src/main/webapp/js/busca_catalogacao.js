@@ -453,30 +453,18 @@ function fazerDownload(){
                 'Não há arquivo...');
         return;
     }
-    
-    
-    var patrimonio = document.getElementById('idpatrimonio3').value;
-    document.getElementById('idFormDownload').patrimonio.value = patrimonio;
-    document.getElementById('idFormDownload').view.value = 'NAO';
-    document.getElementById('idFormDownload').action = 'download';
+    document.getElementById('idFormDownload').action = 
+            'protegido/rest/services/file/'+
+            document.getElementById('idpatrimonio3').value+
+            '/download';
     document.getElementById('idFormDownload').submit();
 }
 //------------------------------------------------------------------------------
 function viewFile(patrimonio){
-    var nomeArq = document.getElementById('idNomeOriginalArquivo').value;
-    nomeArq = nomeArq.trim();
-    if(nomeArq===null || nomeArq===undefined || nomeArq===""){
-        dialogoCatalogacao.escreverMensagem(
-                'mensagemDialogoVermelho',
-                'Não há arquivo...');
-        dialogoBusca.escreverMensagem(
-                'mensagemDialogoVermelho',
-                'Não há arquivo...');
-        return;
-    }
-    document.getElementById('idFormDownload').patrimonio.value = patrimonio;
-    document.getElementById('idFormDownload').view.value = 'SIM';
-    document.getElementById('idFormDownload').action = 'download';
+    document.getElementById('idFormDownload').action = 
+            'protegido/rest/services/file/'+
+            patrimonio+
+            '/view';
     document.getElementById('idFormDownload').target = '_blank';
     document.getElementById('idFormDownload').submit();
 }

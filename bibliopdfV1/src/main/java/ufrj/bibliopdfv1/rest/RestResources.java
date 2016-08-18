@@ -1,7 +1,11 @@
 package ufrj.bibliopdfv1.rest;
 
 import java.io.BufferedReader;
+import java.io.File;
+import java.io.FileInputStream;
+import java.io.InputStream;
 import java.io.InputStreamReader;
+import java.io.OutputStream;
 import java.io.StringReader;
 import java.util.ArrayList;
 import java.util.Iterator;
@@ -24,7 +28,10 @@ import javax.servlet.http.HttpServletResponse;
 import javax.servlet.http.Part;
 import javax.ws.rs.DELETE;
 import javax.ws.rs.POST;
+import javax.ws.rs.core.Response;
+import javax.ws.rs.core.Response.ResponseBuilder;
 import ufrj.bibliopdfv1.Iniciador;
+import ufrj.bibliopdfv1.dto.RespostaDTO;
 
 @Path("services")
 public class RestResources {
@@ -35,6 +42,35 @@ public class RestResources {
     public RestResources() {
     }
 
+    @GET
+    @Path("file/{id}/{mode}")
+//    @Produces(MediaType.APPLICATION_JSON)
+    public Response getFile(
+            @Context HttpServletRequest request,
+            @PathParam("id") String id,
+            @PathParam("mode") String mode) {
+        
+        // Buscar nomeoriginalarquivo na BD
+        String originalName = new BiblioPDFDAO().getNomeArquivoOriginal(id);
+        String mimetype = request.getServletContext().getMimeType(originalName);
+        try{
+            File file = new File(Iniciador.FILES_DIRECTORY_FULL_PATH + id);
+            ResponseBuilder responseBuilder = Response.ok((Object)file);
+            responseBuilder.header("Content-Type", mimetype);
+            if(mode.equals("download")){
+                responseBuilder
+                    .header(
+                        "Content-Disposition",
+                        "attachment; filename=\"" + originalName + "\"" );
+            }
+System.out.println("         originalName: "+originalName+"   mime-type: "+mimetype);        
+            return responseBuilder.build();
+        }catch(Exception e){
+            e.printStackTrace();
+            return null; //return json instead
+        }
+    }
+    
     @DELETE
     @Path("deletereference/{id}")
     @Produces(MediaType.APPLICATION_JSON)
