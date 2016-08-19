@@ -14,6 +14,51 @@ import utils.Utils;
 
 public class BiblioPDFDAO extends BaseDAO {
 
+//------------------------------------------------------------------------------ 
+    public RespostaCompletaDTO searchbyid(String id) {
+        RespostaCompletaDTO listaRefsDTO = new RespostaCompletaDTO();
+        RespostaDTO umaRefDTO = new RespostaDTO();
+        Connection conexao = null;
+        try {
+            conexao = getConnection();
+            PreparedStatement comandoSQL = conexao.prepareStatement(
+                    "SELECT * FROM dadoscatalogo WHERE patrimonio=?;");
+
+            comandoSQL.setLong(1, Long.parseLong(id));
+
+            ResultSet rs = comandoSQL.executeQuery();
+            long patrimonio = 0L;
+            if (rs.next()) {
+                patrimonio = rs.getLong("patrimonio");
+                umaRefDTO.setPatrimonio(Long.toString(patrimonio));
+                umaRefDTO.setTitulo(rs.getString("titulo"));
+                umaRefDTO.setAutoria(rs.getString("autoria"));
+                umaRefDTO.setVeiculo(rs.getString("veiculo"));
+                umaRefDTO.setNomeOriginalArquivo(rs.getString("nomeoriginalarquivo"));
+                umaRefDTO.setData_publicacao(rs.getString("data_publicacao"));
+                umaRefDTO.setNrohits("1");
+                umaRefDTO.setPalchave(buscarPalavrasChave(patrimonio));
+//System.out.println("=== RefDTO: "+umaRefDTO.toString());                
+            } else {
+                umaRefDTO.setPatrimonio("0");
+                umaRefDTO.setTitulo("ERRO");
+            }
+        } catch (Exception e) {
+            umaRefDTO.setPatrimonio("0");
+            umaRefDTO.setTitulo("ERRO");
+            e.printStackTrace();
+        }
+
+        try {
+            if (conexao != null) {
+                conexao.close();
+            }
+        } catch (Exception e) {
+            e.printStackTrace();
+        }
+        listaRefsDTO.addResposta(umaRefDTO);
+        return listaRefsDTO;
+    }
 //------------------------------------------------------------------------------
     public boolean contains(Object[] keys, String key) {
         boolean yes = false;
@@ -982,52 +1027,6 @@ System.out.println("Delete operation is failed.");
         } catch (Exception e) {
             e.printStackTrace();
         }
-        return listaRefsDTO;
-    }
-//------------------------------------------------------------------------------ 
-
-    public RespostaCompletaDTO searchbyid(String id) {
-        RespostaCompletaDTO listaRefsDTO = new RespostaCompletaDTO();
-        RespostaDTO umaRefDTO = new RespostaDTO();
-        Connection conexao = null;
-        try {
-            conexao = getConnection();
-            PreparedStatement comandoSQL = conexao.prepareStatement(
-                    "SELECT * FROM dadoscatalogo WHERE patrimonio=?;");
-
-            comandoSQL.setLong(1, Long.parseLong(id));
-
-            ResultSet rs = comandoSQL.executeQuery();
-            long patrimonio = 0L;
-            if (rs.next()) {
-                patrimonio = rs.getLong("patrimonio");
-                umaRefDTO.setPatrimonio(Long.toString(patrimonio));
-                umaRefDTO.setTitulo(rs.getString("titulo"));
-                umaRefDTO.setAutoria(rs.getString("autoria"));
-                umaRefDTO.setVeiculo(rs.getString("veiculo"));
-                umaRefDTO.setNomeOriginalArquivo(rs.getString("nomeoriginalarquivo"));
-                umaRefDTO.setData_publicacao(rs.getString("data_publicacao"));
-                umaRefDTO.setNrohits("1");
-                umaRefDTO.setPalchave(buscarPalavrasChave(patrimonio));
-//System.out.println("=== RefDTO: "+umaRefDTO.toString());                
-            } else {
-                umaRefDTO.setPatrimonio("0");
-                umaRefDTO.setTitulo("ERRO");
-            }
-        } catch (Exception e) {
-            umaRefDTO.setPatrimonio("0");
-            umaRefDTO.setTitulo("ERRO");
-            e.printStackTrace();
-        }
-
-        try {
-            if (conexao != null) {
-                conexao.close();
-            }
-        } catch (Exception e) {
-            e.printStackTrace();
-        }
-        listaRefsDTO.addResposta(umaRefDTO);
         return listaRefsDTO;
     }
 //------------------------------------------------------------------------------

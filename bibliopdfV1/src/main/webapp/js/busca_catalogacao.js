@@ -96,7 +96,7 @@ function excluirItemAtual(){
     var patrimonio = document.getElementById('idpatrimonio3').value.trim();
     
     var objPedidoAJAX = new XMLHttpRequest();
-    objPedidoAJAX.open('DELETE', 'protegido/rest/services/deletereference/'+patrimonio,true);
+    objPedidoAJAX.open('DELETE', 'protegido/rest/services/reference/'+patrimonio,true);
     // O próprio Browser deve preencher o cabeçalho!!!
 //    objPedidoAJAX.setRequestHeader("Content-Type", "multipart/form-data");
     objPedidoAJAX.responseType = 'json';
@@ -130,7 +130,7 @@ function excluirArquivo(){
     var patrimonio = document.getElementById('idpatrimonio3').value.trim();
     
     var objPedidoAJAX = new XMLHttpRequest();
-    objPedidoAJAX.open('DELETE', 'protegido/rest/services/deletefile/'+patrimonio,true);
+    objPedidoAJAX.open('DELETE', 'protegido/rest/services/file/'+patrimonio,true);
     // O próprio Browser deve preencher o cabeçalho!!!
 //    objPedidoAJAX.setRequestHeader("Content-Type", "multipart/form-data");
     objPedidoAJAX.responseType = 'json';
@@ -155,7 +155,6 @@ function excluirArquivo(){
 }
 //------------------------------------------------------------------------------
 function subirArquivo(){
-//alert("=== subirArquivo");    
     dialogoCatalogacao.escreverMensagem(null,'');
     dialogoBusca.escreverMensagem(null,'');
     
@@ -167,16 +166,11 @@ function subirArquivo(){
     formData.append('patrimonio',patrimonio);
     
     var objPedidoAJAX = new XMLHttpRequest();
-    objPedidoAJAX.open('POST', 'protegido/rest/services/uploadfile/'+patrimonio,true);
-    // O próprio Browser deve preencher o cabeçalho!!!
-//    objPedidoAJAX.setRequestHeader("Content-Type", "multipart/form-data");
-//    objPedidoAJAX.responseType = "text";
-//    objPedidoAJAX.timeout = 10000;
+    objPedidoAJAX.open('POST', 'protegido/rest/services/file/'+patrimonio,true);
     objPedidoAJAX.onreadystatechange = function(){
         document.getElementById("idLoading1").removeAttribute("class");
         document.getElementById("idLoading2").removeAttribute("class");
         if (objPedidoAJAX.readyState === 4 && objPedidoAJAX.status === 200) {
-//alert("=== objPedidoAJAX.responseText: "+objPedidoAJAX.responseText);                    
             if(objPedidoAJAX.responseText==='success'){
                 dialogoCatalogacao.escreverMensagem(
                     'mensagemDialogoVerde',
@@ -647,16 +641,16 @@ function fazerPedidoBusca() {
     }else{
         if(dados.tipoBusca === "patrimonio"){
             fazerPedidoGetAJAX(
-                'protegido/rest/services/searchbyid/'+dados.offset+'/'+dados.patrimonio,
+                'protegido/rest/services/reference/'+dados.patrimonio,
                 respostaDaBusca);
         }else if(dados.tipoBusca === "all"){
             fazerPedidoGetAJAX(
-                'protegido/rest/services/searchbyid/'+dados.offset,
+                'protegido/rest/services/reference/all/'+dados.offset,
                 respostaDaBusca);
         }else if(dados.tipoBusca === "composta"){
 //        dados.operacao = 'buscar';
 //        dados.pagina = pagina;
-            fazerPedidoPostAJAX(dados,'protegido/rest/services/compositesearch/'+dados.offset,
+            fazerPedidoPostAJAX(dados,'protegido/rest/services/reference/some/'+dados.offset,
             respostaDaBusca);
         }
     }
@@ -836,16 +830,19 @@ function mostrarMsgConfirmacaoBuscar(objPedidoAJAX){
 //------------------------------------------------------------------------------
 function salvarNovoItem() {
     var metadados = pegarMetadadosCatalogacao();
-    metadados.operacao = "salvar_novo";
-    metadados.tipoBusca = "null";
-    fazerPedidoPostAJAX(metadados,'protegido/rest/services/savenew',mostrarMsgConfirmacaoSalvar);
+//    metadados.operacao = "salvar_novo";
+//    metadados.tipoBusca = "null";
+    fazerPedidoPostAJAX(metadados,'protegido/rest/services/reference',mostrarMsgConfirmacaoSalvar);
 }
 //------------------------------------------------------------------------------
 function salvarModifsItemAtual() {
     var metadados = pegarMetadadosCatalogacao();
     metadados.operacao = "salvar_modif";
     metadados.tipoBusca = "null";
-    fazerPedidoPutAJAX(metadados,'protegido/rest/services/savemodif/'+metadados.patrimonio,mostrarMsgConfirmacaoSalvarModif);
+    fazerPedidoPutAJAX(
+            metadados,
+            'protegido/rest/services/reference/'+metadados.patrimonio,
+            mostrarMsgConfirmacaoSalvarModif);
 }
 //------------------------------------------------------------------------------
 function mostrarItemAnterior() {

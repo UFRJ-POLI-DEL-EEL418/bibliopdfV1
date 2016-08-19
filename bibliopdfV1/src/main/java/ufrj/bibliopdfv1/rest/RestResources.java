@@ -2,10 +2,7 @@ package ufrj.bibliopdfv1.rest;
 
 import java.io.BufferedReader;
 import java.io.File;
-import java.io.FileInputStream;
-import java.io.InputStream;
 import java.io.InputStreamReader;
-import java.io.OutputStream;
 import java.io.StringReader;
 import java.util.ArrayList;
 import java.util.Iterator;
@@ -31,7 +28,6 @@ import javax.ws.rs.POST;
 import javax.ws.rs.core.Response;
 import javax.ws.rs.core.Response.ResponseBuilder;
 import ufrj.bibliopdfv1.Iniciador;
-import ufrj.bibliopdfv1.dto.RespostaDTO;
 
 @Path("services")
 public class RestResources {
@@ -42,55 +38,40 @@ public class RestResources {
     public RestResources() {
     }
 
+//--------------------------------------------------------
     @GET
-    @Path("file/{id}/{mode}")
-//    @Produces(MediaType.APPLICATION_JSON)
-    public Response getFile(
-            @Context HttpServletRequest request,
-            @PathParam("id") String id,
-            @PathParam("mode") String mode) {
-        
-        // Buscar nomeoriginalarquivo na BD
-        String originalName = new BiblioPDFDAO().getNomeArquivoOriginal(id);
-        String mimetype = request.getServletContext().getMimeType(originalName);
-        try{
-            File file = new File(Iniciador.FILES_DIRECTORY_FULL_PATH + id);
-            ResponseBuilder responseBuilder = Response.ok((Object)file);
-            responseBuilder.header("Content-Type", mimetype);
-            if(mode.equals("download")){
-                responseBuilder
-                    .header(
-                        "Content-Disposition",
-                        "attachment; filename=\"" + originalName + "\"" );
-            }
-System.out.println("         originalName: "+originalName+"   mime-type: "+mimetype);        
-            return responseBuilder.build();
-        }catch(Exception e){
-            e.printStackTrace();
-            return null; //return json instead
-        }
-    }
-    
-    @DELETE
-    @Path("deletereference/{id}")
+    @Path("reference/{id}")
     @Produces(MediaType.APPLICATION_JSON)
-    public String deleteReference(@PathParam("id") String id) {
-        RespostaCompletaDTO respostaCompleta = 
-                new BiblioPDFDAO().deleteReference(id);
+    public String searchbyid(@PathParam("id") String id) {
+        RespostaCompletaDTO respostaCompleta = null;
+        respostaCompleta = new BiblioPDFDAO().searchbyid(id);
         return respostaCompleta.toString();
     }
-    
-    @DELETE
-    @Path("deletefile/{id}")
+//--------------------------------------------------------
+    @GET
+    @Path("reference/all/{offset}")
     @Produces(MediaType.APPLICATION_JSON)
-    public String deleteFile(@PathParam("id") String id) {
-        RespostaCompletaDTO respostaCompleta = 
-                new BiblioPDFDAO().deleteFile(id);
+    public String getAll(@PathParam("offset") String offset) {
+        RespostaCompletaDTO respostaCompleta = null;
+        respostaCompleta = new BiblioPDFDAO().getall(offset);
         return respostaCompleta.toString();
     }
-    
+//--------------------------------------------------------
     @POST
-    @Path("savenew")
+    @Path("reference/some/{offset}")
+    @Consumes(MediaType.APPLICATION_JSON)
+    @Produces(MediaType.APPLICATION_JSON)
+    public String compositesearch(
+                        @PathParam("offset") String offset,
+                        @Context HttpServletRequest request,
+                        @Context HttpServletResponse response) {
+        RespostaCompletaDTO respostaCompleta = 
+                new BiblioPDFDAO().compositeSearch(getRequestJson(request),offset);
+        return respostaCompleta.toString();
+    }
+//--------------------------------------------------------
+    @POST
+    @Path("reference")
     @Consumes(MediaType.APPLICATION_JSON)
     @Produces(MediaType.APPLICATION_JSON)
     public String saveNew(@Context HttpServletRequest request) {
@@ -98,9 +79,9 @@ System.out.println("         originalName: "+originalName+"   mime-type: "+mimet
                 new BiblioPDFDAO().saveNew(getRequestJson(request));
         return respostaCompleta.toString();
     }
-    
+//--------------------------------------------------------
     @PUT
-    @Path("savemodif/{id}")
+    @Path("reference/{id}")
     @Consumes(MediaType.APPLICATION_JSON)
     @Produces(MediaType.APPLICATION_JSON)
     public String saveModif(
@@ -110,9 +91,18 @@ System.out.println("         originalName: "+originalName+"   mime-type: "+mimet
                 new BiblioPDFDAO().saveModif(getRequestJson(request),id);
         return respostaCompleta.toString();
     }
-    
+//--------------------------------------------------------
+    @DELETE
+    @Path("reference/{id}")
+    @Produces(MediaType.APPLICATION_JSON)
+    public String deleteReference(@PathParam("id") String id) {
+        RespostaCompletaDTO respostaCompleta = 
+                new BiblioPDFDAO().deleteReference(id);
+        return respostaCompleta.toString();
+    }
+//--------------------------------------------------------
     @POST
-    @Path("uploadfile/{id}")
+    @Path("file/{id}")
     @Consumes(MediaType.MULTIPART_FORM_DATA)
     @Produces(MediaType.TEXT_PLAIN)
     public String uploadFile(
@@ -141,6 +131,42 @@ System.out.println("         originalName: "+originalName+"   mime-type: "+mimet
         return saved?"success":"failed";
     }
 //--------------------------------------------------------
+    @GET
+    @Path("file/{id}/{mode}")
+//    @Produces(MediaType.APPLICATION_JSON)
+    public Response getFile(
+            @Context HttpServletRequest request,
+            @PathParam("id") String id,
+            @PathParam("mode") String mode) {
+        
+        String originalName = new BiblioPDFDAO().getNomeArquivoOriginal(id);
+        String mimetype = request.getServletContext().getMimeType(originalName);
+        try{
+            File file = new File(Iniciador.FILES_DIRECTORY_FULL_PATH + id);
+            ResponseBuilder responseBuilder = Response.ok((Object)file);
+            responseBuilder.header("Content-Type", mimetype);
+            if(mode.equals("download")){
+                responseBuilder
+                    .header(
+                        "Content-Disposition",
+                        "attachment; filename=\"" + originalName + "\"" );
+            }
+            return responseBuilder.build();
+        }catch(Exception e){
+            e.printStackTrace();
+            return null; //return json instead
+        }
+    }
+//--------------------------------------------------------
+    @DELETE
+    @Path("file/{id}")
+    @Produces(MediaType.APPLICATION_JSON)
+    public String deleteFile(@PathParam("id") String id) {
+        RespostaCompletaDTO respostaCompleta = 
+                new BiblioPDFDAO().deleteFile(id);
+        return respostaCompleta.toString();
+    }
+//--------------------------------------------------------
     private String extractFileName(Part part) {
         String contentDisp = part.getHeader("content-disposition");
         String[] items = contentDisp.split(";");
@@ -152,40 +178,6 @@ System.out.println("         originalName: "+originalName+"   mime-type: "+mimet
         return "";
     }
 //--------------------------------------------------------
-    
-    @GET
-    @Path("searchbyid/{offset}/{id}")
-    @Produces(MediaType.APPLICATION_JSON)
-    public String searchbyid(
-            @PathParam("offset") String offset,
-            @PathParam("id") String id) {
-        RespostaCompletaDTO respostaCompleta = null;
-        respostaCompleta = new BiblioPDFDAO().searchbyid(id);
-        return respostaCompleta.toString();
-    }
-    
-    @GET
-    @Path("searchbyid/{offset}")
-    @Produces(MediaType.APPLICATION_JSON)
-    public String searchbyid(@PathParam("offset") String offset) {
-        RespostaCompletaDTO respostaCompleta = null;
-        respostaCompleta = new BiblioPDFDAO().getall(offset);
-        return respostaCompleta.toString();
-    }
-    
-    @POST
-    @Path("compositesearch/{offset}")
-    @Consumes(MediaType.APPLICATION_JSON)
-    @Produces(MediaType.APPLICATION_JSON)
-    public String compositesearch(
-                        @PathParam("offset") String offset,
-                        @Context HttpServletRequest request,
-                        @Context HttpServletResponse response) {
-        RespostaCompletaDTO respostaCompleta = 
-                new BiblioPDFDAO().compositeSearch(getRequestJson(request),offset);
-        return respostaCompleta.toString();
-    }
-    
     private JsonObject getRequestJson(HttpServletRequest request){
         JsonObject jsonDoPedido = null;
         try{
@@ -202,5 +194,5 @@ System.out.println("         originalName: "+originalName+"   mime-type: "+mimet
         }
         return jsonDoPedido;
     }
-    
+//--------------------------------------------------------
 }
