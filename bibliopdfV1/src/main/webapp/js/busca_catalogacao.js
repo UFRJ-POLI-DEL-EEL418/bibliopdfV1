@@ -96,7 +96,7 @@ function excluirItemAtual(){
     var patrimonio = document.getElementById('idpatrimonio3').value.trim();
     
     var objPedidoAJAX = new XMLHttpRequest();
-    objPedidoAJAX.open('DELETE', 'protegido/rest/services/reference/'+patrimonio,true);
+    objPedidoAJAX.open('DELETE', 'protegido/resources/reference/'+patrimonio,true);
     // O próprio Browser deve preencher o cabeçalho!!!
 //    objPedidoAJAX.setRequestHeader("Content-Type", "multipart/form-data");
     objPedidoAJAX.responseType = 'json';
@@ -130,7 +130,7 @@ function excluirArquivo(){
     var patrimonio = document.getElementById('idpatrimonio3').value.trim();
     
     var objPedidoAJAX = new XMLHttpRequest();
-    objPedidoAJAX.open('DELETE', 'protegido/rest/services/file/'+patrimonio,true);
+    objPedidoAJAX.open('DELETE', 'protegido/resources/file/'+patrimonio,true);
     // O próprio Browser deve preencher o cabeçalho!!!
 //    objPedidoAJAX.setRequestHeader("Content-Type", "multipart/form-data");
     objPedidoAJAX.responseType = 'json';
@@ -166,7 +166,7 @@ function subirArquivo(){
     formData.append('patrimonio',patrimonio);
     
     var objPedidoAJAX = new XMLHttpRequest();
-    objPedidoAJAX.open('POST', 'protegido/rest/services/file/'+patrimonio,true);
+    objPedidoAJAX.open('POST', 'protegido/resources/file/'+patrimonio,true);
     objPedidoAJAX.onreadystatechange = function(){
         document.getElementById("idLoading1").removeAttribute("class");
         document.getElementById("idLoading2").removeAttribute("class");
@@ -448,7 +448,7 @@ function fazerDownload(){
         return;
     }
     document.getElementById('idFormDownload').action = 
-            'protegido/rest/services/file/'+
+            'protegido/resources/file/'+
             document.getElementById('idpatrimonio3').value+
             '/download';
     document.getElementById('idFormDownload').submit();
@@ -456,7 +456,7 @@ function fazerDownload(){
 //------------------------------------------------------------------------------
 function viewFile(patrimonio){
     document.getElementById('idFormDownload').action = 
-            'protegido/rest/services/file/'+
+            'protegido/resources/file/'+
             patrimonio+
             '/view';
     document.getElementById('idFormDownload').target = '_blank';
@@ -641,16 +641,16 @@ function fazerPedidoBusca() {
     }else{
         if(dados.tipoBusca === "patrimonio"){
             fazerPedidoGetAJAX(
-                'protegido/rest/services/reference/'+dados.patrimonio,
+                'protegido/resources/reference/'+dados.patrimonio,
                 respostaDaBusca);
         }else if(dados.tipoBusca === "all"){
             fazerPedidoGetAJAX(
-                'protegido/rest/services/reference/all/'+dados.offset,
+                'protegido/resources/reference/all/'+dados.offset,
                 respostaDaBusca);
         }else if(dados.tipoBusca === "composta"){
 //        dados.operacao = 'buscar';
 //        dados.pagina = pagina;
-            fazerPedidoPostAJAX(dados,'protegido/rest/services/reference/some/'+dados.offset,
+            fazerPedidoPostAJAX(dados,'protegido/resources/reference/some/'+dados.offset,
             respostaDaBusca);
         }
     }
@@ -832,7 +832,7 @@ function salvarNovoItem() {
     var metadados = pegarMetadadosCatalogacao();
 //    metadados.operacao = "salvar_novo";
 //    metadados.tipoBusca = "null";
-    fazerPedidoPostAJAX(metadados,'protegido/rest/services/reference',mostrarMsgConfirmacaoSalvar);
+    fazerPedidoPostAJAX(metadados,'protegido/resources/reference',mostrarMsgConfirmacaoSalvar);
 }
 //------------------------------------------------------------------------------
 function salvarModifsItemAtual() {
@@ -841,7 +841,7 @@ function salvarModifsItemAtual() {
     metadados.tipoBusca = "null";
     fazerPedidoPutAJAX(
             metadados,
-            'protegido/rest/services/reference/'+metadados.patrimonio,
+            'protegido/resources/reference/'+metadados.patrimonio,
             mostrarMsgConfirmacaoSalvarModif);
 }
 //------------------------------------------------------------------------------

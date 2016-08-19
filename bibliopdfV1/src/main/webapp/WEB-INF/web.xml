@@ -57,14 +57,13 @@
     </servlet>
     <servlet-mapping>
         <servlet-name>ufrj.bibliopdfv1.rest.ApplicationConfig</servlet-name>
-        <url-pattern>/protegido/rest/*</url-pattern>
+        <url-pattern>/protegido/resources/*</url-pattern>
     </servlet-mapping>
-    
-    
     
     <session-config>
         <session-timeout>
             30
         </session-timeout>
     </session-config>
+    
 </web-app>

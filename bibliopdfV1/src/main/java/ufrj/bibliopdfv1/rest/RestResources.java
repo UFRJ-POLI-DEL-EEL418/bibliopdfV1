@@ -29,7 +29,7 @@ import javax.ws.rs.core.Response;
 import javax.ws.rs.core.Response.ResponseBuilder;
 import ufrj.bibliopdfv1.Iniciador;
 
-@Path("services")
+@Path("/")
 public class RestResources {
 
     @Context

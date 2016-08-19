@@ -3,7 +3,7 @@ package ufrj.bibliopdfv1.rest;
 import java.util.Set;
 import javax.ws.rs.core.Application;
 
-@javax.ws.rs.ApplicationPath("protegido/rest")
+@javax.ws.rs.ApplicationPath("protegido/resources")
 public class ApplicationConfig extends Application {
 
     @Override
