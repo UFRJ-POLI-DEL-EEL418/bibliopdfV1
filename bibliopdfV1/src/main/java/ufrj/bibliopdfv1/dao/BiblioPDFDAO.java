@@ -166,7 +166,7 @@ System.out.println("Delete operation is failed.");
 
             int deslocamento = 0;
 
-            if (contains(keys, "titulo")) {
+            if (contains(keys, "titulo") && !dados.getString("titulo").isEmpty()) {
                 String[] palavrasDoTitulo = extrairPalavrasDeCampo(dados, "titulo");
                 for (int i = 0; i < palavrasDoTitulo.length; i++) {
                     comandoSQL.setString(i + 1, palavrasDoTitulo[i]);
@@ -176,7 +176,7 @@ System.out.println("Delete operation is failed.");
             }
 //System.out.println("=== [compositeSearch] deslocamento(depois de titulo): "+deslocamento);
 
-            if (contains(keys, "autoria")) {
+            if (contains(keys, "autoria") && !dados.getString("autoria").isEmpty()) {
                 String[] palavrasDaAutoria = extrairPalavrasDeCampo(dados, "autoria");
                 for (int i = 0; i < palavrasDaAutoria.length; i++) {
                     comandoSQL.setString(i + 1 + deslocamento, palavrasDaAutoria[i]);
@@ -186,7 +186,7 @@ System.out.println("Delete operation is failed.");
             }
 //System.out.println("=== [compositeSearch] deslocamento(depois de autoria): "+deslocamento);
 
-            if (contains(keys, "veiculo")) {
+            if (contains(keys, "veiculo") && !dados.getString("veiculo").isEmpty()) {
                 String[] palavrasDoVeiculo = extrairPalavrasDeCampo(dados, "veiculo");
                 for (int i = 0; i < palavrasDoVeiculo.length; i++) {
                     comandoSQL.setString(i + 1 + deslocamento, palavrasDoVeiculo[i]);
@@ -196,7 +196,7 @@ System.out.println("Delete operation is failed.");
             }
 //System.out.println("=== [compositeSearch] deslocamento(depois de veiculo): "+deslocamento);
 
-            if (contains(keys, "data_publicacao1")) {
+            if (contains(keys, "data_publicacao1") && !dados.getString("data_publicacao1").isEmpty()) {
                 comandoSQL.setString(deslocamento + 1, dados.getString("data_publicacao1"));
                 comandoCountSQL.setString(deslocamento + 1, dados.getString("data_publicacao1"));
                 comandoSQL.setString(deslocamento + 2, dados.getString("data_publicacao2"));
@@ -205,7 +205,7 @@ System.out.println("Delete operation is failed.");
             }
 //System.out.println("=== [compositeSearch] deslocamento(depois de data_publicacao 1 e 2): "+deslocamento);
 
-            if (contains(keys, "palchave")) {
+            if (contains(keys, "palchave") && !dados.getString("palchave").isEmpty()) {
                 String[] palChaveNormalizadas = separarPalChaveNormalizadas(dados);
                 for (int i = 0; i < palChaveNormalizadas.length; i++) {
                     comandoSQL.setString(i + 1 + deslocamento, palChaveNormalizadas[i]);
@@ -367,7 +367,7 @@ System.out.println("Delete operation is failed.");
 
         //===== INICIO
         String comando = inicioComando;
-        if (contains(keys, "titulo")) {
+        if (contains(keys, "titulo") && !dados.getString("titulo").isEmpty()) {
             String[] palavrasDoTitulo = extrairPalavrasDeCampo(dados, "titulo");
             comando = comando + inicioOpcaoTitulo;
             for (int i = 0; i < palavrasDoTitulo.length; i++) {
@@ -379,9 +379,9 @@ System.out.println("Delete operation is failed.");
             comando = comando + fimOpcaoTitulo;
         }
 
-        if (contains(keys, "autoria")) {
+        if (contains(keys, "autoria") && !dados.getString("autoria").isEmpty()) {
 
-            if (contains(keys, "titulo")) {
+            if (contains(keys, "titulo") && !dados.getString("titulo").isEmpty()) {
                 comando = comando + union;
             }
 
@@ -396,10 +396,10 @@ System.out.println("Delete operation is failed.");
             comando = comando + fimOpcaoAutoria;
         }
 
-        if (contains(keys, "veiculo")) {
+        if (contains(keys, "veiculo") && !dados.getString("veiculo").isEmpty()) {
 
-            if (contains(keys, "titulo")
-                    || contains(keys, "autoria")) {
+            if (    (contains(keys, "titulo") && !dados.getString("titulo").isEmpty())||
+                    (contains(keys, "autoria") && !dados.getString("autoria").isEmpty())) {
                 comando = comando + union;
             }
 
@@ -414,21 +414,21 @@ System.out.println("Delete operation is failed.");
             comando = comando + fimOpcaoVeiculo;
         }
 
-        if (contains(keys, "data_publicacao1")) {
-            if (contains(keys, "titulo")
-                    || contains(keys, "autoria")
-                    || contains(keys, "veiculo")) {
+        if (contains(keys, "data_publicacao1") && !dados.getString("data_publicacao1").isEmpty()) {
+            if (    (contains(keys, "titulo") && !dados.getString("titulo").isEmpty())||
+                    (contains(keys, "autoria") && !dados.getString("autoria").isEmpty())||
+                    (contains(keys, "veiculo") && !dados.getString("veiculo").isEmpty())) {
                 comando = comando + union;
             }
             comando = comando + opcaoDataPublicacao;
         }
 
-        if (contains(keys, "palchave")) {
+        if (contains(keys, "palchave") && !dados.getString("palchave").isEmpty()) {
 
-            if (contains(keys, "titulo")
-                    || contains(keys, "autoria")
-                    || contains(keys, "veiculo")
-                    || contains(keys, "data_publicacao1")) {
+            if (    (contains(keys, "titulo") && !dados.getString("titulo").isEmpty())||
+                    (contains(keys, "autoria") && !dados.getString("autoria").isEmpty())||
+                    (contains(keys, "veiculo") && !dados.getString("veiculo").isEmpty())||
+                    (contains(keys, "data_publicacao1") && !dados.getString("data_publicacao1").isEmpty())) {
                 comando = comando + union;
             }
 
@@ -532,7 +532,7 @@ System.out.println("Delete operation is failed.");
 
         //===== INICIO
         String comando = inicioComando;
-        if (contains(keys, "titulo")) {
+        if (contains(keys, "titulo") && !dados.getString("titulo").isEmpty()) {
             String[] palavrasDoTitulo = extrairPalavrasDeCampo(dados, "titulo");
             comando = comando + inicioOpcaoTitulo;
             for (int i = 0; i < palavrasDoTitulo.length; i++) {
@@ -544,9 +544,9 @@ System.out.println("Delete operation is failed.");
             comando = comando + fimOpcaoTitulo;
         }
 
-        if (contains(keys, "autoria")) {
+        if (contains(keys, "autoria") && !dados.getString("autoria").isEmpty()) {
 
-            if (contains(keys, "titulo")) {
+            if (contains(keys, "titulo") && !dados.getString("titulo").isEmpty()) {
                 comando = comando + union;
             }
 
@@ -561,10 +561,10 @@ System.out.println("Delete operation is failed.");
             comando = comando + fimOpcaoAutoria;
         }
 
-        if (contains(keys, "veiculo")) {
+        if (contains(keys, "veiculo") && !dados.getString("veiculo").isEmpty()) {
 
-            if (contains(keys, "titulo")
-                    || contains(keys, "autoria")) {
+            if (    (contains(keys, "titulo") && !dados.getString("titulo").isEmpty())||
+                    (contains(keys, "autoria") && !dados.getString("autoria").isEmpty())) {
                 comando = comando + union;
             }
 
@@ -579,21 +579,21 @@ System.out.println("Delete operation is failed.");
             comando = comando + fimOpcaoVeiculo;
         }
 
-        if (contains(keys, "data_publicacao1")) {
-            if (contains(keys, "titulo")
-                    || contains(keys, "autoria")
-                    || contains(keys, "veiculo")) {
+        if (contains(keys, "data_publicacao1") && !dados.getString("data_publicacao1").isEmpty()) {
+            if (    (contains(keys, "titulo") && !dados.getString("titulo").isEmpty())||
+                    (contains(keys, "autoria") && !dados.getString("autoria").isEmpty())||
+                    (contains(keys, "veiculo") && !dados.getString("veiculo").isEmpty())) {
                 comando = comando + union;
             }
             comando = comando + opcaoDataPublicacao;
         }
 
-        if (contains(keys, "palchave")) {
+        if (contains(keys, "palchave") && !dados.getString("palchave").isEmpty()) {
 
-            if (contains(keys, "titulo")
-                    || contains(keys, "autoria")
-                    || contains(keys, "veiculo")
-                    || contains(keys, "data_publicacao1")) {
+            if (    (contains(keys, "titulo") && !dados.getString("titulo").isEmpty())||
+                    (contains(keys, "autoria") && !dados.getString("autoria").isEmpty())||
+                    (contains(keys, "veiculo") && !dados.getString("veiculo").isEmpty())||
+                    (contains(keys, "data_publicacao1") && !dados.getString("data_publicacao1").isEmpty())) {
                 comando = comando + union;
             }
 

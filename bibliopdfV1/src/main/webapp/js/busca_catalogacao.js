@@ -342,6 +342,9 @@ function camposEscolhidosDaBusca() {
                 campos.titulo = {};
                 campos.titulo = tit;
             }
+        }else{
+                campos.titulo = {};
+                campos.titulo = "";
         }
         if (controleDeChecks.autoria.checked) {
             var aut = document.getElementById('idautoria2').value.trim();
@@ -349,6 +352,9 @@ function camposEscolhidosDaBusca() {
                 campos.autoria = {};
                 campos.autoria = aut;
             }
+        }else{
+                campos.autoria = {};
+                campos.autoria = "";
         }
         if (controleDeChecks.veiculo.checked) {
             var vei = document.getElementById('idveiculo2').value.trim();
@@ -356,6 +362,9 @@ function camposEscolhidosDaBusca() {
                 campos.veiculo = {};
                 campos.veiculo = vei;
             }
+        }else{
+                campos.veiculo = {};
+                campos.veiculo = "";
         }
         if (controleDeChecks.data_publicacao.checked) {
             var dat1 = document.getElementById('iddata_publicacao21').value.trim();
@@ -372,6 +381,11 @@ function camposEscolhidosDaBusca() {
             }else{
                 campos.data_publicacao2 = '30000000';
             }
+        }else{
+                campos.data_publicacao1 = {};
+                campos.data_publicacao1 = "";
+                campos.data_publicacao2 = {};
+                campos.data_publicacao2 = "";
         }
         if (controleDeChecks.palchave.checked) {
             var pal = document.getElementById('idpalchave2').value.trim();
@@ -379,6 +393,9 @@ function camposEscolhidosDaBusca() {
                 campos.palchave = {};
                 campos.palchave = pal;
             }
+        }else{
+                campos.palchave = {};
+                campos.palchave = "";
         }
         
         if (Object.keys(campos).length === 2) {
@@ -650,8 +667,18 @@ function fazerPedidoBusca() {
         }else if(dados.tipoBusca === "composta"){
 //        dados.operacao = 'buscar';
 //        dados.pagina = pagina;
-            fazerPedidoPostAJAX(dados,'protegido/resources/reference/some/'+dados.offset,
-            respostaDaBusca);
+       
+var url = 'protegido/resources/reference/some/'+dados.offset+
+                    '?titulo='+dados.titulo+
+                    '&autoria='+dados.autoria+
+                    '&veiculo='+dados.veiculo+
+                    '&data_publicacao1='+dados.data_publicacao1+
+                    '&data_publicacao2='+dados.data_publicacao2+
+                    '&palchave='+dados.palchave;
+//alert(url);            
+//            fazerPedidoPostAJAX(dados,'protegido/resources/reference/some/'+dados.offset,
+//            respostaDaBusca);
+            fazerPedidoGetAJAX(url,respostaDaBusca);
         }
     }
 }

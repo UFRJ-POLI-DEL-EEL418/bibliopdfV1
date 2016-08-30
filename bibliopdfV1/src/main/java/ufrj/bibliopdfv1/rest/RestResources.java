@@ -70,6 +70,42 @@ public class RestResources {
         return respostaCompleta.toString();
     }
 //--------------------------------------------------------
+    @GET
+    @Path("reference/some/{offset}")
+    @Produces(MediaType.APPLICATION_JSON)
+    public String getsearch(
+                        @PathParam("offset") String offset,
+                        @Context HttpServletRequest request,
+                        @Context HttpServletResponse response) {
+        
+        String titulo = request.getParameter("titulo");
+System.out.println(" titulo:"+titulo);        
+        String autoria = request.getParameter("autoria");
+System.out.println(" autoria:"+autoria);        
+        String veiculo = request.getParameter("veiculo");
+System.out.println(" veiculo:"+veiculo);        
+        String data_publicacao1 = request.getParameter("data_publicacao1");
+System.out.println(" data_publicacao1:"+data_publicacao1);        
+        String data_publicacao2 = request.getParameter("data_publicacao2");
+System.out.println(" data_publicacao2:"+data_publicacao2);        
+        String palchave = request.getParameter("palchave");
+System.out.println(" palchave:"+palchave);        
+        
+        JsonObject jsonObj = Json.createObjectBuilder()
+                    .add("titulo",titulo)
+                    .add("autoria",autoria)
+                    .add("veiculo",veiculo)
+                    .add("data_publicacao1",data_publicacao1)
+                    .add("data_publicacao2",data_publicacao2)
+                    .add("palchave",palchave)
+                    .add("offset",offset)
+                    .build();
+
+        RespostaCompletaDTO respostaCompleta = 
+                new BiblioPDFDAO().compositeSearch(jsonObj,offset);
+        return respostaCompleta.toString();
+    }
+//--------------------------------------------------------
     @POST
     @Path("reference")
     @Consumes(MediaType.APPLICATION_JSON)
