@@ -57,6 +57,7 @@ public class RestResources {
         return respostaCompleta.toString();
     }
 //--------------------------------------------------------
+/*    
     @POST
     @Path("reference/some/{offset}")
     @Consumes(MediaType.APPLICATION_JSON)
@@ -69,6 +70,7 @@ public class RestResources {
                 new BiblioPDFDAO().compositeSearch(getRequestJson(request),offset);
         return respostaCompleta.toString();
     }
+*/
 //--------------------------------------------------------
     @GET
     @Path("reference/some/{offset}")
@@ -77,7 +79,7 @@ public class RestResources {
                         @PathParam("offset") String offset,
                         @Context HttpServletRequest request,
                         @Context HttpServletResponse response) {
-        
+/*        
         String titulo = request.getParameter("titulo");
 System.out.println(" titulo:"+titulo);        
         String autoria = request.getParameter("autoria");
@@ -90,14 +92,14 @@ System.out.println(" data_publicacao1:"+data_publicacao1);
 System.out.println(" data_publicacao2:"+data_publicacao2);        
         String palchave = request.getParameter("palchave");
 System.out.println(" palchave:"+palchave);        
-        
+*/        
         JsonObject jsonObj = Json.createObjectBuilder()
-                    .add("titulo",titulo)
-                    .add("autoria",autoria)
-                    .add("veiculo",veiculo)
-                    .add("data_publicacao1",data_publicacao1)
-                    .add("data_publicacao2",data_publicacao2)
-                    .add("palchave",palchave)
+                    .add("titulo",request.getParameter("titulo"))
+                    .add("autoria",request.getParameter("autoria"))
+                    .add("veiculo",request.getParameter("veiculo"))
+                    .add("data_publicacao1",request.getParameter("data_publicacao1"))
+                    .add("data_publicacao2",request.getParameter("data_publicacao2"))
+                    .add("palchave",request.getParameter("palchave"))
                     .add("offset",offset)
                     .build();
 

@@ -665,16 +665,14 @@ function fazerPedidoBusca() {
                 'protegido/resources/reference/all/'+dados.offset,
                 respostaDaBusca);
         }else if(dados.tipoBusca === "composta"){
-//        dados.operacao = 'buscar';
-//        dados.pagina = pagina;
-       
-var url = 'protegido/resources/reference/some/'+dados.offset+
+            var url = 'protegido/resources/reference/some/'+dados.offset+
                     '?titulo='+dados.titulo+
                     '&autoria='+dados.autoria+
                     '&veiculo='+dados.veiculo+
                     '&data_publicacao1='+dados.data_publicacao1+
                     '&data_publicacao2='+dados.data_publicacao2+
                     '&palchave='+dados.palchave;
+            url = encodeURI(url);
 //alert(url);            
 //            fazerPedidoPostAJAX(dados,'protegido/resources/reference/some/'+dados.offset,
 //            respostaDaBusca);
