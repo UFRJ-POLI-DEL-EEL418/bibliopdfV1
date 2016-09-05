@@ -38,14 +38,14 @@ function main() {
     dialogoCatalogacao = new ObjDialogo('idMsgDialogo3');
     controleDoMenu = new ControleDoMenu();
     controleDeChecks = new ControleDeChecks();
-    controlePaginacao = ObjControlePaginacao();
+    controlePaginacao = new ObjControlePaginacao();
     limparPaginaDeBuscas();
     limparPaginaDeCatalogacao();
 
     document.getElementById('tabelaCatalogacao2').style.display = "none";
 
     //  1. BUSCAR+dadosDaBusca
-    document.getElementById('idBuscar').addEventListener("click",fazerPedidoBusca);
+    document.getElementById('idBuscar').addEventListener("click",fazerPedidoBusca1);
 //  2. PAGINA_ANTERIOR+nroPagina
 //  3. PROXIMA_PAGINA+nroPagina
 //  5. LIMPAR_BUSCA
@@ -648,6 +648,42 @@ function callBack(objPedidoAJAX) { //--- MODELO DE CALLBACK
         }
     }
 }
+//------------------------------------------------------------------------------
+function fazerPedidoBusca1() {
+    var dados = camposEscolhidosDaBusca();
+    controlePaginacao.paginaAtual = 1;
+    document.getElementById("idPaginaDestino").value = 1;
+    dados.offset = 0;
+    fazerPedidoBusca();
+//alert("Página atual: "+document.getElementById('idPaginaDestino').value+", Offset: "+dados.offset);    
+    if(dados.resultadoOK===false){
+        dialogoBusca.escreverMensagem(dados.cor,dados.msg);
+        return;
+    }else{
+        if(dados.tipoBusca === "patrimonio"){
+            fazerPedidoGetAJAX(
+                'protegido/resources/reference/'+dados.patrimonio,
+                respostaDaBusca);
+        }else if(dados.tipoBusca === "all"){
+            fazerPedidoGetAJAX(
+                'protegido/resources/reference/all/'+dados.offset,
+                respostaDaBusca);
+        }else if(dados.tipoBusca === "composta"){
+            var url = 'protegido/resources/reference/some/'+dados.offset+
+                    '?titulo='+dados.titulo+
+                    '&autoria='+dados.autoria+
+                    '&veiculo='+dados.veiculo+
+                    '&data_publicacao1='+dados.data_publicacao1+
+                    '&data_publicacao2='+dados.data_publicacao2+
+                    '&palchave='+dados.palchave;
+            url = encodeURI(url);
+//alert(url);            
+//            fazerPedidoPostAJAX(dados,'protegido/resources/reference/some/'+dados.offset,
+//            respostaDaBusca);
+            fazerPedidoGetAJAX(url,respostaDaBusca);
+        }
+    }
+}    
 //------------------------------------------------------------------------------
 function fazerPedidoBusca() {
     var dados = camposEscolhidosDaBusca();

@@ -4,7 +4,6 @@
         <description>ServletContextListener</description>
         <listener-class>ufrj.bibliopdfv1.Iniciador</listener-class>
     </listener>
-    
     <security-constraint>
         <display-name>protegidoSecurityConstraint</display-name>
         <web-resource-collection>
@@ -21,7 +20,6 @@
             <transport-guarantee>CONFIDENTIAL</transport-guarantee>
         </user-data-constraint>
     </security-constraint>
-    
     <login-config>
         <auth-method>FORM</auth-method>
         <realm-name>bibliopdfRealm</realm-name>
@@ -45,7 +43,6 @@
         <servlet-name>Logout</servlet-name>
         <url-pattern>/logout</url-pattern>
     </servlet-mapping>
-    
     <servlet>
         <servlet-name>ufrj.bibliopdfv1.rest.ApplicationConfig</servlet-name>
         <multipart-config>
@@ -59,11 +56,9 @@
         <servlet-name>ufrj.bibliopdfv1.rest.ApplicationConfig</servlet-name>
         <url-pattern>/protegido/resources/*</url-pattern>
     </servlet-mapping>
-    
     <session-config>
         <session-timeout>
             30
         </session-timeout>
     </session-config>
-    
 </web-app>
