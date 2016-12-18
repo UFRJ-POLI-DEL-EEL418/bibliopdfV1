@@ -180,7 +180,7 @@ System.out.println(" palchave:"+palchave);
         String originalName = new BiblioPDFDAO().getNomeArquivoOriginal(id);
         String mimetype = request.getServletContext().getMimeType(originalName);
         try{
-            File file = new File(Iniciador.FILES_DIRECTORY_FULL_PATH + id);
+            File file = new File(Iniciador.FILES_DIRECTORY_FULL_PATH +"/"+ id);
             ResponseBuilder responseBuilder = Response.ok((Object)file);
             responseBuilder.header("Content-Type", mimetype);
             if(mode.equals("download")){

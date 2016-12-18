@@ -18,6 +18,9 @@ function mainLogin(){
 //------------------------------------------------------------------------------
 function enviarUsernameDigestedPassword(){
     document.getElementById('idSenhaDigested').value = md5(document.getElementById('idSenha').value);
+//    document.getElementById('idSenhaDigested').value = document.getElementById('idSenha').value;
+//console.log(document.getElementById('idSenhaDigested').value);
+//alert(document.getElementById('idSenha').value);
     document.getElementById('idForm').submit();
 }
 //------------------------------------------------------------------------------

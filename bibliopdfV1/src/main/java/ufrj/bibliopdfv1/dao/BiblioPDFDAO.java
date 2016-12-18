@@ -114,7 +114,7 @@ System.out.println("Delete operation is failed.");
         RespostaDTO umaRefDTO = new RespostaDTO();
         listaRefsDTO.addResposta(umaRefDTO);
         try {
-            File file = new File(Iniciador.FILES_DIRECTORY_FULL_PATH+id);
+            File file = new File(Iniciador.FILES_DIRECTORY_FULL_PATH+"/"+id);
             if(file.delete()){
                 listaRefsDTO.setSucesso(true);
 System.out.println(file.getName() + " is deleted!");

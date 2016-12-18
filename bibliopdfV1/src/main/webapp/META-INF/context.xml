@@ -1,6 +1,41 @@
 <?xml version="1.0" encoding="UTF-8"?>
 <Context path="/bibliopdfV1">
-  <Resource auth="Container" driverClassName="org.postgresql.Driver" logAbandoned="false" maxIdle="10" maxTotal="20" maxWaitMillis="-1" name="jdbc/authority" password="abracadabra" removeAbandonedTimeout="60" type="javax.sql.DataSource" url="jdbc:postgresql://127.0.0.1:5432/usuariossenhas" username="postgres"/>
-  <Realm className="org.apache.catalina.realm.DataSourceRealm" dataSourceName="jdbc/authority" localDataSource="true" name="bibliopdfRealm" roleNameCol="grupo" userCredCol="senha" userNameCol="usuario" userRoleTable="grupos" userTable="usuarios"/>
-  <Resource auth="Container" driverClassName="org.postgresql.Driver" logAbandoned="false" maxIdle="10" maxTotal="20" maxWaitMillis="-1" name="jdbc/dbpdf" password="abracadabra" removeAbandonedTimeout="60" type="javax.sql.DataSource" url="jdbc:postgresql://127.0.0.1:5432/bibliopdf2016" username="postgres"/>
+  <Resource 
+      auth="Container" 
+      driverClassName="org.postgresql.Driver" 
+      logAbandoned="false" 
+      maxIdle="10" 
+      maxTotal="20" 
+      maxWaitMillis="-1" 
+      name="jdbc/authority" 
+      password="abracadabra" 
+      removeAbandonedTimeout="60" 
+      type="javax.sql.DataSource" 
+      url="jdbc:postgresql://127.0.0.1:5432/usuariossenhas" 
+      username="postgres"
+  />
+  <Realm 
+      className="org.apache.catalina.realm.DataSourceRealm" 
+      dataSourceName="jdbc/authority" 
+      localDataSource="true" 
+      name="bibliopdfRealm" 
+      roleNameCol="grupo" 
+      userCredCol="senha" 
+      userNameCol="usuario" 
+      userRoleTable="grupos" 
+      userTable="usuarios"
+  />
+  <Resource 
+      auth="Container" 
+      driverClassName="org.postgresql.Driver" 
+      logAbandoned="false" 
+      maxIdle="10" 
+      maxTotal="20" 
+      maxWaitMillis="-1" 
+      name="jdbc/dbpdf" 
+      password="abracadabra" 
+      removeAbandonedTimeout="60" 
+      type="javax.sql.DataSource" 
+      url="jdbc:postgresql://127.0.0.1:5432/bibliopdf2016" 
+      username="postgres"/>
 </Context>
